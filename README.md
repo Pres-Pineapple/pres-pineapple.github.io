@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -77,7 +76,7 @@
 <body>
 
 <h1>Arrow Placement Simulator</h1>
-<p class="subtitle">FFXIV — conveyor belt mechanic practice</p>
+<p class="subtitle">Clicky arrows <3</p>
 
 <div class="card">
   <div class="top-bar">
