@@ -149,7 +149,10 @@ function isValidSecond(i){ return isMatching()?(i===cur.s5||i===cur.s8)&&i!==sl5
 function rnd(a){return a[Math.floor(Math.random()*a.length)];}
 
 function init(){
-  cur=rnd(PLAYERS);
+  const base=rnd(PLAYERS);
+  // Randomly swap s5/s8 so debuffs can arrive in either clockwise order
+  const swap=Math.random()<0.5;
+  cur={...base, s5:swap?base.s8:base.s5, s8:swap?base.s5:base.s8};
   phase='5s';sl5=null;sl8=null;wrongSlot=null;
   gameState='waiting';
   startTime=null;timer5Done=false;timer8Done=false;
