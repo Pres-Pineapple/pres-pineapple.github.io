@@ -1,0 +1,332 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FFXIV Arrow Placement Simulator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #111;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; color: #fff; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  .card {
+    background: #1a1a1a;
+    border: 0.5px solid #333;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 580px;
+  }
+  .top-bar { display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;min-height:48px; }
+  .debuffs { display:flex;gap:10px; }
+  .debuff-card { background:#222;border:0.5px solid #444;border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:8px; }
+  .debuff-label { font-size:11px;color:#888; }
+  .debuff-arrow { font-size:26px;line-height:1;color:#e0e0e0; }
+  .timers { display:flex;gap:10px;align-items:center; }
+  .timer-card { border-radius:8px;padding:6px 14px;text-align:center;min-width:64px; }
+  .timer-card.t5 { background:#1a2a3a;border:0.5px solid #2a6aaa; }
+  .timer-card.t8 { background:#2a2010;border:0.5px solid #aa8020; }
+  .timer-card.tdone { background:#102a10;border:0.5px solid #2a8a2a; }
+  .timer-card.tfail { background:#2a1010;border:0.5px solid #aa2a2a; }
+  .timer-label { font-size:10px;color:#888; }
+  .timer-val { font-size:20px;font-weight:500; }
+  .timer-card.t5 .timer-val { color:#5aadff; }
+  .timer-card.t8 .timer-val { color:#ffcc44; }
+  .timer-card.tdone .timer-val { color:#4adf4a; }
+  .timer-card.tfail .timer-val { color:#ff5a5a; }
+  .arena-wrap { width:100%;max-width:500px;margin:0 auto;aspect-ratio:1; }
+  svg { width:100%;height:100%; }
+  .msg { text-align:center;margin-top:10px;font-size:13px;min-height:20px;color:#888; }
+  .msg.ok  { color:#4adf4a;font-weight:500; }
+  .msg.err { color:#ff5a5a;font-weight:500; }
+  .bottom-bar { display:flex;justify-content:center;gap:10px;margin-top:14px; }
+  button {
+    cursor:pointer;font-size:13px;padding:7px 20px;
+    background:transparent;color:#ccc;
+    border:0.5px solid #555;border-radius:8px;
+    transition:background 0.12s;
+  }
+  button:hover { background:#2a2a2a; }
+  button:active { transform:scale(0.98); }
+  .start-btn { font-size:14px;padding:9px 30px;font-weight:500;color:#fff;border-color:#666; }
+  .rules {
+    margin-top:1.5rem;
+    background:#161616;
+    border:0.5px solid #2a2a2a;
+    border-radius:10px;
+    padding:1rem 1.25rem;
+    font-size:12px;
+    color:#777;
+    line-height:1.7;
+    max-width:580px;
+    width:100%;
+  }
+  .rules strong { color:#aaa; font-weight:500; }
+  .rules ul { padding-left:1.2rem;margin-top:0.4rem; }
+</style>
+</head>
+<body>
+
+<h1>Arrow Placement Simulator</h1>
+<p class="subtitle">FFXIV — conveyor belt mechanic practice</p>
+
+<div class="card">
+  <div class="top-bar">
+    <div class="debuffs" id="debuffs"></div>
+    <div class="timers" id="timers"></div>
+  </div>
+  <div class="arena-wrap">
+    <svg id="svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <p class="msg" id="msg"></p>
+  <div class="bottom-bar" id="bottom-bar"></div>
+</div>
+
+<div class="rules">
+  <strong>How to play</strong>
+  <ul>
+    <li>Press <strong>Start</strong> — your two arrow debuffs will appear.</li>
+    <li><strong>Matching arrows</strong> (same direction) → place both in the cardinal box (mid-edge).</li>
+    <li><strong>Mixed arrows</strong> (different directions) → place both in the intercardinal box (corner).</li>
+    <li>Click your <strong>5s arrow spot first</strong>, then your <strong>8s arrow spot</strong> before the timers run out.</li>
+    <li>Any wrong click ends the round immediately.</li>
+  </ul>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const CX=250,CY=250;
+const L=115,R=385,T=115,B=385;
+const SIDE=R-L;
+const S=SIDE/4;
+
+const SLOTS=[
+  {x:L,     y:T,     dir:'right'},
+  {x:L+S,   y:T,     dir:'right'},
+  {x:L+S*2, y:T,     dir:'right'},
+  {x:L+S*3, y:T,     dir:'right'},
+  {x:R,     y:T,     dir:'down'},
+  {x:R,     y:T+S,   dir:'down'},
+  {x:R,     y:T+S*2, dir:'down'},
+  {x:R,     y:T+S*3, dir:'down'},
+  {x:R,     y:B,     dir:'left'},
+  {x:R-S,   y:B,     dir:'left'},
+  {x:R-S*2, y:B,     dir:'left'},
+  {x:R-S*3, y:B,     dir:'left'},
+  {x:L,     y:B,     dir:'up'},
+  {x:L,     y:B-S,   dir:'up'},
+  {x:L,     y:B-S*2, dir:'up'},
+  {x:L,     y:B-S*3, dir:'up'},
+];
+
+const PLAYERS=[
+  {name:'NW',s5:15,s8:0,  type:'intercardinal',color:'pink'},
+  {name:'N', s5:1, s8:2,  type:'cardinal',     color:'blue'},
+  {name:'NE',s5:3, s8:4,  type:'intercardinal',color:'pink'},
+  {name:'E', s5:5, s8:6,  type:'cardinal',     color:'blue'},
+  {name:'SE',s5:7, s8:8,  type:'intercardinal',color:'pink'},
+  {name:'S', s5:9, s8:10, type:'cardinal',     color:'blue'},
+  {name:'SW',s5:11,s8:12, type:'intercardinal',color:'pink'},
+  {name:'W', s5:13,s8:14, type:'cardinal',     color:'blue'},
+];
+
+const A={right:'→',down:'↓',left:'←',up:'↑'};
+
+let cur,phase,sl5,sl8,wrongSlot,gameState;
+let startTime,timer5Done,timer8Done,rafId;
+
+function isMatching(){ return SLOTS[cur.s5].dir===SLOTS[cur.s8].dir; }
+function isValidFirst(i){ return isMatching()?(i===cur.s5||i===cur.s8):i===cur.s5; }
+function isValidSecond(i){ return isMatching()?(i===cur.s5||i===cur.s8)&&i!==sl5:i===cur.s8; }
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+
+function init(){
+  cur=rnd(PLAYERS);
+  phase='5s';sl5=null;sl8=null;wrongSlot=null;
+  gameState='waiting';
+  startTime=null;timer5Done=false;timer8Done=false;
+  if(rafId) cancelAnimationFrame(rafId);
+  renderDebuffs();renderTimers();renderBottomBar();
+  draw();setMsg('Press Start when ready.','');
+}
+
+function startRound(){
+  gameState='running';
+  startTime=performance.now();
+  renderDebuffs();renderTimers();renderBottomBar();
+  draw();tick();
+}
+
+function fail(reason,badSlot){
+  if(badSlot!==undefined) wrongSlot=badSlot;
+  gameState='failed';
+  if(rafId) cancelAnimationFrame(rafId);
+  renderTimers();renderBottomBar();draw();
+  setMsg(reason,'err');
+}
+
+function tick(){
+  if(gameState!=='running') return;
+  const elapsed=(performance.now()-startTime)/1000;
+  const t5=Math.max(0,5-elapsed);
+  const t8=Math.max(0,8-elapsed);
+  if(elapsed>=5&&!timer5Done){
+    timer5Done=true;
+    if(sl5===null){fail('Too slow! You missed the 5s arrow placement.');return;}
+  }
+  if(elapsed>=8&&!timer8Done){
+    timer8Done=true;
+    if(sl8===null){fail('Too slow! You missed the 8s arrow placement.');return;}
+  }
+  renderTimers(t5,t8);
+  rafId=requestAnimationFrame(tick);
+}
+
+function renderDebuffs(){
+  const el=document.getElementById('debuffs');
+  if(gameState==='waiting'){
+    el.innerHTML=`<div style="font-size:13px;color:#666;">Your debuffs will appear on start.</div>`;
+    return;
+  }
+  const a5=A[SLOTS[cur.s5].dir],a8=A[SLOTS[cur.s8].dir];
+  el.innerHTML=`
+    <div class="debuff-card"><span class="debuff-arrow">${a5}</span><div><div class="debuff-label">5s arrow</div></div></div>
+    <div class="debuff-card"><span class="debuff-arrow">${a8}</span><div><div class="debuff-label">8s arrow</div></div></div>`;
+}
+
+function renderTimers(t5,t8){
+  const el=document.getElementById('timers');
+  if(gameState==='waiting'){el.innerHTML='';return;}
+  if(gameState==='failed'){
+    el.innerHTML=`<div class="timer-card tfail"><div class="timer-label">failed</div><div class="timer-val">✗</div></div>`;
+    return;
+  }
+  if(gameState==='done'){
+    el.innerHTML=`<div class="timer-card tdone"><div class="timer-label">complete</div><div class="timer-val">✓</div></div>`;
+    return;
+  }
+  const elapsed=(performance.now()-startTime)/1000;
+  const v5=(t5!==undefined)?t5:Math.max(0,5-elapsed);
+  const v8=(t8!==undefined)?t8:Math.max(0,8-elapsed);
+  const fmt=v=>v.toFixed(1);
+  el.innerHTML=`
+    <div class="timer-card ${sl5!==null?'tdone':'t5'}">
+      <div class="timer-label">${sl5!==null?'placed':'5s arrow'}</div>
+      <div class="timer-val">${sl5!==null?'✓':fmt(v5)+'s'}</div>
+    </div>
+    <div class="timer-card ${sl8!==null?'tdone':'t8'}">
+      <div class="timer-label">${sl8!==null?'placed':'8s arrow'}</div>
+      <div class="timer-val">${sl8!==null?'✓':fmt(v8)+'s'}</div>
+    </div>`;
+}
+
+function renderBottomBar(){
+  const el=document.getElementById('bottom-bar');
+  if(gameState==='waiting') el.innerHTML=`<button class="start-btn" onclick="startRound()">Start</button>`;
+  else if(gameState==='running') el.innerHTML='';
+  else el.innerHTML=`<button onclick="init()">Try again ↺</button>`;
+}
+
+function mk(tag,attrs){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;}
+function tx(txt,attrs){const e=mk('text',attrs);e.textContent=txt;return e;}
+
+function playerBox(p){
+  const s5=SLOTS[p.s5],s8=SLOTS[p.s8];
+  const PAD=22;
+  let x1=Math.min(s5.x,s8.x)-PAD,y1=Math.min(s5.y,s8.y)-PAD;
+  let x2=Math.max(s5.x,s8.x)+PAD,y2=Math.max(s5.y,s8.y)+PAD;
+  if(p.type==='intercardinal'){
+    const corners=[{x:L,y:T},{x:R,y:T},{x:R,y:B},{x:L,y:B}];
+    for(const c of corners){
+      const d5=Math.hypot(s5.x-c.x,s5.y-c.y);
+      const d8=Math.hypot(s8.x-c.x,s8.y-c.y);
+      if(d5<SIDE*0.6&&d8<SIDE*0.6){
+        x1=Math.min(x1,c.x-PAD);y1=Math.min(y1,c.y-PAD);
+        x2=Math.max(x2,c.x+PAD);y2=Math.max(y2,c.y+PAD);
+        break;
+      }
+    }
+  }
+  return{x:x1,y:y1,w:x2-x1,h:y2-y1};
+}
+
+function draw(){
+  const svg=document.getElementById('svg');
+  svg.innerHTML='';
+  const isActive=gameState==='running';
+
+  // Arena circle
+  svg.appendChild(mk('circle',{cx:CX,cy:CY,r:222,fill:'none',stroke:'#333','stroke-width':'1.5'}));
+  // Square guide
+  svg.appendChild(mk('rect',{x:L,y:T,width:SIDE,height:SIDE,fill:'none',
+    stroke:'#444','stroke-width':'1','stroke-dasharray':'5 3',opacity:'0.4'}));
+
+  // Player boxes
+  PLAYERS.forEach(p=>{
+    const b=playerBox(p);
+    const col=p.color==='pink'?'#D4537E':'#378ADD';
+    svg.appendChild(mk('rect',{x:b.x,y:b.y,width:b.w,height:b.h,rx:'10',
+      fill:'none',stroke:col,'stroke-width':'1.5',opacity:'0.35'}));
+  });
+
+  // Slots
+  SLOTS.forEach((slot,i)=>{
+    const is5=sl5===i,is8=sl8===i,isWrong=wrongSlot===i;
+    let fill='#1e1e1e',stroke='#444',aTxt='·',aCol='#555';
+    if(is5){fill='#1a2a3a';stroke='#2a6aaa';aTxt=A[slot.dir];aCol='#5aadff';}
+    if(is8){fill='#2a2010';stroke='#aa8020';aTxt=A[slot.dir];aCol='#ffcc44';}
+    if(isWrong){fill='#2a1010';stroke='#aa2a2a';aTxt=A[slot.dir];aCol='#ff5a5a';}
+
+    const g=mk('g',{});
+    const clickable=isActive&&!is5&&!is8;
+    const c=mk('circle',{cx:slot.x,cy:slot.y,r:18,fill,stroke,'stroke-width':'1.5',
+      cursor:clickable?'pointer':'default'});
+    if(clickable){
+      c.addEventListener('click',()=>handleClick(i));
+      c.addEventListener('mouseenter',()=>c.setAttribute('fill','#2a2a2a'));
+      c.addEventListener('mouseleave',()=>c.setAttribute('fill','#1e1e1e'));
+    }
+    g.appendChild(c);
+    g.appendChild(tx(aTxt,{x:slot.x,y:slot.y+1,'text-anchor':'middle','dominant-baseline':'central',
+      fill:aCol,'font-size':'15','pointer-events':'none'}));
+    svg.appendChild(g);
+  });
+
+  let centerTxt='';
+  if(gameState==='waiting') centerTxt='press start';
+  else if(gameState==='running') centerTxt=isMatching()?'matching arrows':'mixed arrows';
+  svg.appendChild(tx(centerTxt,{x:CX,y:CY,'text-anchor':'middle','dominant-baseline':'central',
+    fill:'#555','font-size':'12','pointer-events':'none'}));
+}
+
+function handleClick(i){
+  if(gameState!=='running') return;
+  if(phase==='5s'){
+    if(isValidFirst(i)){sl5=i;phase='8s';setMsg('','');draw();}
+    else{fail(`Wrong position! That arrow doesn't belong there.`,i);}
+  } else {
+    if(isValidSecond(i)){
+      sl8=i;phase='done';gameState='done';
+      if(rafId) cancelAnimationFrame(rafId);
+      renderTimers();renderBottomBar();draw();
+      setMsg(`${cur.name} — both arrows placed correctly!`,'ok');
+    } else {
+      fail(`Wrong position! That arrow doesn't belong there.`,i);
+    }
+  }
+}
+
+function setMsg(t,type){const e=document.getElementById('msg');e.textContent=t;e.className='msg'+(type?' '+type:'');}
+
+init();
+</script>
+</body>
+</html>
