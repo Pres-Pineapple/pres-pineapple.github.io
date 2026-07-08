@@ -444,12 +444,9 @@ const RF_STEPS=[
   {label:"Stack/Spread 1"},
   {label:"Gaze 1",real:"Look Away",fake:"Look Toward"},
   {label:"Fire",real:"AOE",fake:"Donut"},
-  {label:"Lightning (Stored)"},
   {label:"Stack/Spread 2"},
   {label:"Gaze 2",real:"Look Away",fake:"Look Toward"},
-  {label:"Ice (Stored)"},
   {label:"Water",real:"Donut",fake:"AOE"},
-  {label:"Real/Fake (Stored)"},
 ];
  
 const rfContainer=document.getElementById('rf-steps');
@@ -491,7 +488,15 @@ RF_STEPS.forEach((step)=>{
   );
 });
  
-document.getElementById('rf-bomb').appendChild(
+const rfBomb=document.getElementById('rf-bomb');
+ 
+rfBomb.appendChild(
+  rfMakeRow('Lightning (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'})
+);
+rfBomb.appendChild(
+  rfMakeRow('Ice (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'})
+);
+rfBomb.appendChild(
   rfMakeRow(
     'Acceleration Bomb',
     {cls:'stillness',text:'Stillness'},
@@ -510,4 +515,3 @@ function rfReset(){
 </script>
 </body>
 </html>
- 
