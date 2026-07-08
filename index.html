@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FFXIV Arrow Placement Simulator</title>
+<title>FFXIV Kefka Ultimate Raid Tools</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -15,16 +15,36 @@
     align-items: center;
     padding: 2rem 1rem;
   }
-  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; color: #fff; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; color: #fff; text-align: center; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; text-align: center; }
+ 
+  /* Two-column layout */
+  .columns {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .col.sim { max-width: 580px; }
+  .col.tracker { max-width: 420px; }
+ 
   .card {
     background: #1a1a1a;
     border: 0.5px solid #333;
     border-radius: 12px;
     padding: 1.5rem;
     width: 100%;
-    max-width: 580px;
   }
+ 
+  /* ---------- Arrows sim ---------- */
   .top-bar { display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;min-height:48px; }
   .debuffs { display:flex;gap:10px; }
   .debuff-card { background:#222;border:0.5px solid #444;border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:8px; }
@@ -66,48 +86,117 @@
     font-size:12px;
     color:#777;
     line-height:1.7;
-    max-width:580px;
     width:100%;
   }
   .rules strong { color:#aaa; font-weight:500; }
   .rules ul { padding-left:1.2rem;margin-top:0.4rem; }
+  .contact-box { text-align:center; }
+ 
+  /* ---------- Kefka real/fake tracker ---------- */
+  .rf-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: #222;
+    border: 0.5px solid #333;
+    margin-bottom: 7px;
+  }
+  .rf-label { color: #ccc; font-size: 14px; }
+  .rf-group { display: flex; gap: 7px; }
+  .choice {
+    min-width: 60px;
+    padding: 6px 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 7px;
+    border: 0.5px solid #555;
+    color: #888;
+    background: transparent;
+  }
+  .choice:hover { background: #2a2a2a; }
+  .choice.real.active {
+    border-color: #2a8a2a;
+    color: #4adf4a;
+    background: #102a10;
+  }
+  .choice.fake.active {
+    border-color: #aa2a2a;
+    color: #ff5a5a;
+    background: #2a1010;
+  }
+  .choice.real.active:hover { background: #143214; }
+  .choice.fake.active:hover { background: #321414; }
+  .rf-reset {
+    width: 100%;
+    margin-top: 12px;
+    padding: 9px 0;
+    font-weight: 500;
+    color: #fff;
+    border-color: #666;
+  }
 </style>
 </head>
 <body>
-
-<h1>Arrow Placement Simulator</h1>
-<p class="subtitle">DMU clicky arrows sim <3</p>
-
-<div class="card">
-  <div class="top-bar">
-    <div class="debuffs" id="debuffs"></div>
-    <div class="timers" id="timers"></div>
+ 
+<h1>FFXIV Kefka Ultimate Raid Tools</h1>
+<p class="subtitle">DMU clicky arrows sim &amp; P4 tracker &lt;3</p>
+ 
+<div class="columns">
+ 
+  <!-- ===== Arrow Placement Simulator ===== -->
+  <div class="col sim">
+    <h1>Arrow Placement Simulator</h1>
+    <p class="subtitle">practice your arrow spots</p>
+    <div class="card">
+      <div class="top-bar">
+        <div class="debuffs" id="debuffs"></div>
+        <div class="timers" id="timers"></div>
+      </div>
+      <div class="arena-wrap">
+        <svg id="svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <p class="msg" id="msg"></p>
+      <div class="bottom-bar" id="bottom-bar"></div>
+    </div>
+ 
+    <div class="rules">
+      <strong>How to play</strong>
+      <ul>
+        <li>Press <strong>Start</strong> — your two arrow debuffs will appear.</li>
+        <li><strong>Matching arrows</strong> (same direction) → place both in the cardinal box (mid-edge).</li>
+        <li><strong>Mixed arrows</strong> (different directions) → place both in the intercardinal box (corner).</li>
+        <li>Click your <strong>5s arrow spot first</strong>, then your <strong>8s arrow spot</strong> before the timers run out.</li>
+        <li>Any wrong click ends the round immediately.</li>
+      </ul>
+    </div>
   </div>
-  <div class="arena-wrap">
-    <svg id="svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+ 
+  <!-- ===== Kefka Real/Fake Tracker ===== -->
+  <div class="col tracker">
+    <h1>Kefka — Phase 4</h1>
+    <p class="subtitle">real / fake tracker</p>
+    <div class="card">
+      <div id="rf-steps"></div>
+      <button class="rf-reset" onclick="rfReset()">Reset</button>
+    </div>
+    <div class="rules contact-box">
+      Contact <strong>Ayla Hatsuke</strong> on <strong>Discord</strong> with questions.
+    </div>
   </div>
-  <p class="msg" id="msg"></p>
-  <div class="bottom-bar" id="bottom-bar"></div>
+ 
 </div>
-
-<div class="rules">
-  <strong>How to play</strong>
-  <ul>
-    <li>Press <strong>Start</strong> — your two arrow debuffs will appear.</li>
-    <li><strong>Matching arrows</strong> (same direction) → place both in the cardinal box (mid-edge).</li>
-    <li><strong>Mixed arrows</strong> (different directions) → place both in the intercardinal box (corner).</li>
-    <li>Click your <strong>5s arrow spot first</strong>, then your <strong>8s arrow spot</strong> before the timers run out.</li>
-    <li>Any wrong click ends the round immediately.</li>
-  </ul>
-</div>
-
+ 
 <script>
+/* ================= Arrow Placement Simulator ================= */
 const NS="http://www.w3.org/2000/svg";
 const CX=250,CY=250;
 const L=115,R=385,T=115,B=385;
 const SIDE=R-L;
 const S=SIDE/4;
-
+ 
 const SLOTS=[
   {x:L,     y:T,     dir:'right'},
   {x:L+S,   y:T,     dir:'right'},
@@ -126,7 +215,7 @@ const SLOTS=[
   {x:L,     y:B-S*2, dir:'up'},
   {x:L,     y:B-S*3, dir:'up'},
 ];
-
+ 
 const PLAYERS=[
   {name:'NW',s5:15,s8:0,  type:'intercardinal',color:'pink'},
   {name:'N', s5:1, s8:2,  type:'cardinal',     color:'blue'},
@@ -137,17 +226,17 @@ const PLAYERS=[
   {name:'SW',s5:11,s8:12, type:'intercardinal',color:'pink'},
   {name:'W', s5:13,s8:14, type:'cardinal',     color:'blue'},
 ];
-
+ 
 const A={right:'→',down:'↓',left:'←',up:'↑'};
-
+ 
 let cur,phase,sl5,sl8,wrongSlot,gameState;
 let startTime,timer5Done,timer8Done,rafId;
-
+ 
 function isMatching(){ return SLOTS[cur.s5].dir===SLOTS[cur.s8].dir; }
 function isValidFirst(i){ return isMatching()?(i===cur.s5||i===cur.s8):i===cur.s5; }
 function isValidSecond(i){ return isMatching()?(i===cur.s5||i===cur.s8)&&i!==sl5:i===cur.s8; }
 function rnd(a){return a[Math.floor(Math.random()*a.length)];}
-
+ 
 function init(){
   const base=rnd(PLAYERS);
   // Randomly swap s5/s8 so debuffs can arrive in either clockwise order
@@ -160,14 +249,14 @@ function init(){
   renderDebuffs();renderTimers();renderBottomBar();
   draw();setMsg('Press Start when ready.','');
 }
-
+ 
 function startRound(){
   gameState='running';
   startTime=performance.now();
   renderDebuffs();renderTimers();renderBottomBar();
   draw();tick();
 }
-
+ 
 function fail(reason,badSlot){
   if(badSlot!==undefined) wrongSlot=badSlot;
   gameState='failed';
@@ -175,7 +264,7 @@ function fail(reason,badSlot){
   renderTimers();renderBottomBar();draw();
   setMsg(reason,'err');
 }
-
+ 
 function tick(){
   if(gameState!=='running') return;
   const elapsed=(performance.now()-startTime)/1000;
@@ -192,7 +281,7 @@ function tick(){
   renderTimers(t5,t8);
   rafId=requestAnimationFrame(tick);
 }
-
+ 
 function renderDebuffs(){
   const el=document.getElementById('debuffs');
   if(gameState==='waiting'){
@@ -204,7 +293,7 @@ function renderDebuffs(){
     <div class="debuff-card"><span class="debuff-arrow">${a5}</span><div><div class="debuff-label">5s arrow</div></div></div>
     <div class="debuff-card"><span class="debuff-arrow">${a8}</span><div><div class="debuff-label">8s arrow</div></div></div>`;
 }
-
+ 
 function renderTimers(t5,t8){
   const el=document.getElementById('timers');
   if(gameState==='waiting'){el.innerHTML='';return;}
@@ -230,17 +319,17 @@ function renderTimers(t5,t8){
       <div class="timer-val">${sl8!==null?'✓':fmt(v8)+'s'}</div>
     </div>`;
 }
-
+ 
 function renderBottomBar(){
   const el=document.getElementById('bottom-bar');
   if(gameState==='waiting') el.innerHTML=`<button class="start-btn" onclick="startRound()">Start</button>`;
   else if(gameState==='running') el.innerHTML='';
   else el.innerHTML=`<button onclick="init()">Try again ↺</button>`;
 }
-
+ 
 function mk(tag,attrs){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;}
 function tx(txt,attrs){const e=mk('text',attrs);e.textContent=txt;return e;}
-
+ 
 function playerBox(p){
   const s5=SLOTS[p.s5],s8=SLOTS[p.s8];
   const PAD=22;
@@ -260,18 +349,18 @@ function playerBox(p){
   }
   return{x:x1,y:y1,w:x2-x1,h:y2-y1};
 }
-
+ 
 function draw(){
   const svg=document.getElementById('svg');
   svg.innerHTML='';
   const isActive=gameState==='running';
-
+ 
   // Arena circle
   svg.appendChild(mk('circle',{cx:CX,cy:CY,r:222,fill:'none',stroke:'#333','stroke-width':'1.5'}));
   // Square guide
   svg.appendChild(mk('rect',{x:L,y:T,width:SIDE,height:SIDE,fill:'none',
     stroke:'#444','stroke-width':'1','stroke-dasharray':'5 3',opacity:'0.4'}));
-
+ 
   // Player boxes
   PLAYERS.forEach(p=>{
     const b=playerBox(p);
@@ -279,7 +368,7 @@ function draw(){
     svg.appendChild(mk('rect',{x:b.x,y:b.y,width:b.w,height:b.h,rx:'10',
       fill:'none',stroke:col,'stroke-width':'1.5',opacity:'0.35'}));
   });
-
+ 
   // Slots
   SLOTS.forEach((slot,i)=>{
     const is5=sl5===i,is8=sl8===i,isWrong=wrongSlot===i;
@@ -287,7 +376,7 @@ function draw(){
     if(is5){fill='#1a2a3a';stroke='#2a6aaa';aTxt=A[slot.dir];aCol='#5aadff';}
     if(is8){fill='#2a2010';stroke='#aa8020';aTxt=A[slot.dir];aCol='#ffcc44';}
     if(isWrong){fill='#2a1010';stroke='#aa2a2a';aTxt=A[slot.dir];aCol='#ff5a5a';}
-
+ 
     const g=mk('g',{});
     const clickable=isActive&&!is5&&!is8;
     const c=mk('circle',{cx:slot.x,cy:slot.y,r:18,fill,stroke,'stroke-width':'1.5',
@@ -302,14 +391,14 @@ function draw(){
       fill:aCol,'font-size':'15','pointer-events':'none'}));
     svg.appendChild(g);
   });
-
+ 
   let centerTxt='';
   if(gameState==='waiting') centerTxt='press start';
   else if(gameState==='running') centerTxt=isMatching()?'matching arrows':'mixed arrows';
   svg.appendChild(tx(centerTxt,{x:CX,y:CY,'text-anchor':'middle','dominant-baseline':'central',
     fill:'#555','font-size':'12','pointer-events':'none'}));
 }
-
+ 
 function handleClick(i){
   if(gameState!=='running') return;
   if(phase==='5s'){
@@ -326,10 +415,62 @@ function handleClick(i){
     }
   }
 }
-
+ 
 function setMsg(t,type){const e=document.getElementById('msg');e.textContent=t;e.className='msg'+(type?' '+type:'');}
-
+ 
 init();
+ 
+/* ================= Kefka Real/Fake Tracker ================= */
+const RF_STEPS=[
+  "Stack/Spread 1",
+  "Gaze 1",
+  "Fire",
+  "Lightning (Stored)",
+  "Stack/Spread 2",
+  "Gaze 2",
+  "Ice (Stored)",
+  "Water",
+  "Real/Fake (Stored)",
+];
+ 
+const rfContainer=document.getElementById('rf-steps');
+ 
+RF_STEPS.forEach((step)=>{
+  const row=document.createElement('div');
+  row.className='rf-row';
+ 
+  const label=document.createElement('span');
+  label.className='rf-label';
+  label.textContent=step;
+ 
+  const group=document.createElement('div');
+  group.className='rf-group';
+ 
+  const realBtn=document.createElement('button');
+  realBtn.className='choice real';
+  realBtn.textContent='Real';
+ 
+  const fakeBtn=document.createElement('button');
+  fakeBtn.className='choice fake';
+  fakeBtn.textContent='Fake';
+ 
+  realBtn.onclick=()=>rfToggle(realBtn,fakeBtn);
+  fakeBtn.onclick=()=>rfToggle(fakeBtn,realBtn);
+ 
+  group.append(realBtn,fakeBtn);
+  row.append(label,group);
+  rfContainer.appendChild(row);
+});
+ 
+function rfToggle(clicked,other){
+  clicked.classList.toggle('active');
+  other.classList.remove('active');
+}
+ 
+function rfReset(){
+  document.querySelectorAll('.choice').forEach((b)=>b.classList.remove('active'));
+}
 </script>
 </body>
 </html>
+ 
