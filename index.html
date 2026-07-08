@@ -107,7 +107,7 @@
   .rf-group { display: flex; gap: 7px; }
   .choice {
     min-width: 60px;
-    padding: 6px 0;
+    padding: 6px 10px;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -129,6 +129,23 @@
   }
   .choice.real.active:hover { background: #143214; }
   .choice.fake.active:hover { background: #321414; }
+  .choice.stillness.active {
+    border-color: #2a6aaa;
+    color: #5aadff;
+    background: #1a2a3a;
+  }
+  .choice.motion.active {
+    border-color: #aa8020;
+    color: #ffcc44;
+    background: #2a2010;
+  }
+  .choice.stillness.active:hover { background: #1e3244; }
+  .choice.motion.active:hover { background: #322614; }
+  .rf-divider {
+    border: none;
+    border-top: 0.5px solid #333;
+    margin: 14px 0;
+  }
   .rf-reset {
     width: 100%;
     margin-top: 12px;
@@ -148,7 +165,7 @@
  
   <!-- ===== Arrow Placement Simulator ===== -->
   <div class="col sim">
-    <h1>Arrow Placement Simulator</h1>
+    <h1>P1 Arrow Placement Simulator</h1>
     <p class="subtitle">practice your arrow spots</p>
     <div class="card">
       <div class="top-bar">
@@ -176,10 +193,12 @@
  
   <!-- ===== Kefka Real/Fake Tracker ===== -->
   <div class="col tracker">
-    <h1>Kefka — Phase 4</h1>
+    <h1>P4 State Tracker</h1>
     <p class="subtitle">real / fake tracker</p>
     <div class="card">
       <div id="rf-steps"></div>
+      <hr class="rf-divider">
+      <div id="rf-bomb"></div>
       <button class="rf-reset" onclick="rfReset()">Reset</button>
     </div>
     <div class="rules contact-box">
@@ -422,45 +441,63 @@ init();
  
 /* ================= Kefka Real/Fake Tracker ================= */
 const RF_STEPS=[
-  "Stack/Spread 1",
-  "Gaze 1",
-  "Fire",
-  "Lightning (Stored)",
-  "Stack/Spread 2",
-  "Gaze 2",
-  "Ice (Stored)",
-  "Water",
-  "Real/Fake (Stored)",
+  {label:"Stack/Spread 1"},
+  {label:"Gaze 1",real:"Look Away",fake:"Look Toward"},
+  {label:"Fire",real:"AOE",fake:"Donut"},
+  {label:"Lightning (Stored)"},
+  {label:"Stack/Spread 2"},
+  {label:"Gaze 2",real:"Look Away",fake:"Look Toward"},
+  {label:"Ice (Stored)"},
+  {label:"Water",real:"Donut",fake:"AOE"},
+  {label:"Real/Fake (Stored)"},
 ];
  
 const rfContainer=document.getElementById('rf-steps');
  
-RF_STEPS.forEach((step)=>{
+function rfMakeRow(labelText,optA,optB){
   const row=document.createElement('div');
   row.className='rf-row';
  
   const label=document.createElement('span');
   label.className='rf-label';
-  label.textContent=step;
+  label.textContent=labelText;
  
   const group=document.createElement('div');
   group.className='rf-group';
  
-  const realBtn=document.createElement('button');
-  realBtn.className='choice real';
-  realBtn.textContent='Real';
+  const btnA=document.createElement('button');
+  btnA.className=`choice ${optA.cls}`;
+  btnA.textContent=optA.text;
  
-  const fakeBtn=document.createElement('button');
-  fakeBtn.className='choice fake';
-  fakeBtn.textContent='Fake';
+  const btnB=document.createElement('button');
+  btnB.className=`choice ${optB.cls}`;
+  btnB.textContent=optB.text;
  
-  realBtn.onclick=()=>rfToggle(realBtn,fakeBtn);
-  fakeBtn.onclick=()=>rfToggle(fakeBtn,realBtn);
+  btnA.onclick=()=>rfToggle(btnA,btnB);
+  btnB.onclick=()=>rfToggle(btnB,btnA);
  
-  group.append(realBtn,fakeBtn);
+  group.append(btnA,btnB);
   row.append(label,group);
-  rfContainer.appendChild(row);
+  return row;
+}
+ 
+RF_STEPS.forEach((step)=>{
+  rfContainer.appendChild(
+    rfMakeRow(
+      step.label,
+      {cls:'real',text:step.real||'Real'},
+      {cls:'fake',text:step.fake||'Fake'}
+    )
+  );
 });
+ 
+document.getElementById('rf-bomb').appendChild(
+  rfMakeRow(
+    'Acceleration Bomb',
+    {cls:'stillness',text:'Stillness'},
+    {cls:'motion',text:'Motion'}
+  )
+);
  
 function rfToggle(clicked,other){
   clicked.classList.toggle('active');
