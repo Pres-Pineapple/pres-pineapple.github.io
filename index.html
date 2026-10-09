@@ -435,10 +435,10 @@
   <p class="subtitle">Kefka Says · red border = resolves here</p>
   <div class="tl-track">
     <span class="tl-track-label">KEEP TRACK OF</span>
-    <div><b>Tsunami</b> <span>→ Dynamic Fluid (step 14)</span></div>
-    <div><b>Inferno</b> <span>→ Entropy (step 11)</span></div>
-    <div><b>Thunder III</b> <span>+ ring (step 14)</span></div>
-    <div><b>Blizzard III</b> <span>+ ring (step 14)</span></div>
+    <div><b>Tsunami</b> <span>→ Dynamic Fluid (step 12)</span></div>
+    <div><b>Inferno</b> <span>→ Entropy (step 9)</span></div>
+    <div><b>Thunder III</b> <span>+ ring (step 12)</span></div>
+    <div><b>Blizzard III</b> <span>+ ring (step 12)</span></div>
   </div>
   <div class="tl-cols">
     <div class="tl-col" id="tl-left"></div>
@@ -449,6 +449,7 @@
     <ul>
       <li><b>Stack/Spread from the 1st Grand Cross</b> means you ALWAYS get an Acceleration Bomb from the 2nd. If you got a bomb from the 1st, the 2nd can't be predicted.</li>
       <li><b>Gazes match Neo Exdeath's Grand Cross.</b> Fake 1st Grand Cross = fake Gaze #1. Same for the 2nd Grand Cross and Gaze #2.</li>
+      <li><b>Shortcut for combining real / fake:</b> treat real as + and fake as −, then multiply. + × + or − × − = + (real); + × − = − (fake).</li>
     </ul>
   </div>
   <p class="tl-foot">Real / fake and twister / donut change every pull. Follow the NOTE tags.</p>
@@ -694,12 +695,12 @@ init();
  
 /* ================= Kefka Real/Fake Tracker ================= */
 const RF_STEPS=[
-  {label:"Stack/Spread 1",tl:"1 · 4",boss:"Neo Exdeath"},
+  {label:"Stack/Spread 1",tl:"1 · 3",boss:"Neo Exdeath"},
   {label:"Gaze 1",real:"Look Away",fake:"Look Toward",tl:"1",boss:"Neo Exdeath"},
-  {label:"Fire",real:"AOE",fake:"Donut",tl:"1 · 4",boss:"Chaos"},
-  {label:"Stack/Spread 2",tl:"1 · 4",boss:"Neo Exdeath"},
-  {label:"Gaze 2",real:"Look Away",fake:"Look Toward",tl:"4",boss:"Neo Exdeath"},
-  {label:"Water",real:"Donut",fake:"AOE",tl:"1 · 4",boss:"Chaos"},
+  {label:"Fire",real:"AOE",fake:"Donut",tl:"2 · 4",boss:"Chaos"},
+  {label:"Stack/Spread 2",tl:"1 · 3",boss:"Neo Exdeath"},
+  {label:"Gaze 2",real:"Look Away",fake:"Look Toward",tl:"3",boss:"Neo Exdeath"},
+  {label:"Water",real:"Donut",fake:"AOE",tl:"2 · 4",boss:"Chaos"},
 ];
  
 const rfContainer=document.getElementById('rf-steps');
@@ -763,17 +764,17 @@ RF_STEPS.forEach((step)=>{
 const rfBomb=document.getElementById('rf-bomb');
  
 rfBomb.appendChild(
-  rfMakeRow('Lightning (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'10','Kefka')
+  rfMakeRow('Lightning (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'8','Kefka')
 );
 rfBomb.appendChild(
-  rfMakeRow('Ice (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'12','Kefka')
+  rfMakeRow('Ice (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'10','Kefka')
 );
 rfBomb.appendChild(
   rfMakeRow(
     'Acceleration Bomb',
     {cls:'stillness',text:'Stillness'},
     {cls:'motion',text:'Motion'},
-    '1 · 4',
+    '1 · 3',
     'Neo Exdeath'
   )
 );
@@ -812,24 +813,23 @@ const TL_ICONS = {"water": "data:image/webp;base64,UklGRowFAABXRUJQVlA4WAoAAAAQA
 // body lines: plain string, or [kind, text] where kind = real | fake | warn | math
 // icons: name, add "!" if it resolves on this step, "#n" for a number badge
 const TL_STEPS = [
-  { t:'Tsunami or Inferno + Grand Cross 1', note:'CHAOS', icons:['water','lightning','bomb','shriek#1'], body:[
-    'Chaos casts Tsunami or Inferno. Note which one, and REAL or FAKE: Tsunami decides your Dynamic Fluid, Inferno your Entropy.',
-    'Neo Exdeath: first set of timed debuffs (Long / Short). You get either a Stack/Spread or an Acceleration Bomb.',
-    'Includes 2 short Cursed Shrieks: these give Gazes #1 (step 10).']},
-  { t:'Dynamic Fluid or Entropy applied', icons:['fluid','entropy'], body:[
-    'Whichever matches the step 1 cast: Tsunami = Dynamic Fluid, Inferno = Entropy.',
-    'Everyone gets it, same duration (long or short).']},
-  { t:'Grand Cross 2 + Mystery Magic', body:[
-    'Neo Exdeath Grand Cross 2 and Kefka Mystery Magic (Thunder + Ice). Each can be real or fake.', 'Dodge.']},
-  { t:'Inferno or Tsunami + 2nd debuff set', note:'CHAOS', icons:['shriek#2'], body:[
-    'Chaos casts the other one (whichever wasn\'t cast in step 1). Note REAL or FAKE.',
-    'Second set of Neo Exdeath debuffs (real or fake). You get either a Stack/Spread or an Acceleration Bomb.',
-    'Includes 2 long Cursed Shrieks: these give Gazes #2 (step 13).']},
-  { t:'Entropy or Dynamic Fluid applied', icons:['entropy','fluid'], body:[
-    'The other debuff, matching the step 4 cast.',
-    'Everyone gets it, same duration (long or short).']},
-  { t:'Grand Cross 3 + Mystery Magic', body:["Grand Cross real/fake doesn't matter here.", 'Dodge Thunder + Ice.']},
-  { t:'Wounds applied', icons:['white','black','field','beyond'], body:[
+  { t:'Mystery Magic + Grand Cross 1', note:'EXDEATH', icons:['water','lightning','bomb','shriek#1'], body:[
+    'Kefka Mystery Magic (Thunder + Ice). Each can be real or fake. Dodge.',
+    'Neo Exdeath casts Grand Cross 1: first set of timed debuffs (Long / Short).',
+    'You get either a Stack/Spread or an Acceleration Bomb.',
+    'Includes 2 short Cursed Shrieks: these give Gazes #1 (step 8).']},
+  { t:'Tsunami or Inferno + 1st elemental debuff', note:'CHAOS', icons:['fluid','entropy'], body:[
+    'Chaos casts Tsunami or Inferno. Note which one, and real or fake.',
+    'Tsunami = Dynamic Fluid, Inferno = Entropy. Everyone gets it, same duration (long or short).']},
+  { t:'Mystery Magic + Grand Cross 2', note:'EXDEATH', icons:['water','lightning','bomb','shriek#2'], body:[
+    'Kefka Mystery Magic (Thunder + Ice) and Neo Exdeath Grand Cross 2. Each can be real or fake. Dodge.',
+    "Second set of debuffs: you can get whichever of Stack/Spread or Acceleration Bomb you didn't get first.",
+    'Includes 2 long Cursed Shrieks: these give Gazes #2 (step 11).']},
+  { t:'Inferno or Tsunami + 2nd elemental debuff', note:'CHAOS', icons:['entropy','fluid'], body:[
+    "Chaos casts the other one (whichever wasn't cast in step 2). Note real or fake.",
+    'Everyone gets the other debuff, same duration (long or short).']},
+  { t:'Mystery Magic + Grand Cross 3 + Wounds', icons:['white','black','field','beyond'], body:[
+    "Grand Cross real/fake doesn't matter here.", 'Dodge Thunder + Ice.',
     'Everyone: White or Black Wound.', '4 get Allagan Field, 4 get Beyond Death.']},
   { t:'Flood of Naught', icons:['field!','beyond!'], body:[
     'Neo Exdeath jumps to a random cardinal / intercard. One side gets a White orb, the other Black.',
@@ -840,7 +840,7 @@ const TL_STEPS = [
     'Support stack N · DPS stack S · Support spread W · DPS spread E.',
     "Everyone max melee. Spreads: don't go to the wall.",
     '4 players resolve Stillness / Motion here.',
-    "Spread players can mark themselves as a reminder. (Kefka's Mana Charge does nothing.)"]},
+    "Spread players can mark themselves as a reminder."]},
   { t:'Thrumming Thunder III + Gazes #1', note:'THUNDER', icons:['shriek!#1'], body:[
     'Kefka casts Thrumming Thunder III. REMEMBER real or fake.',
     'First gazes resolve. Gazes: Support N, DPS S.',
@@ -888,7 +888,7 @@ function tlRender(){
         <ul>${lines}</ul>
       </div>
       ${icons?`<div class="tl-icons${st.icons.length===1?' one':''}">${icons}</div>`:''}`;
-    document.getElementById(i<8?'tl-left':'tl-right').appendChild(el);
+    document.getElementById(i<6?'tl-left':'tl-right').appendChild(el);
   });
 }
 tlRender();
