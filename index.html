@@ -216,6 +216,27 @@
   .section-break-top { margin-top:1.5rem; margin-bottom:1.5rem; }
   .section-break span { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#888; white-space:nowrap; }
 
+  /* ---------- Phase guide carousel ---------- */
+  .pg { width:100%; max-width:1024px; display:flex; flex-direction:column; align-items:center; scroll-margin-top:16px; }
+  .pg-slide { width:100%; display:none; flex-direction:column; align-items:center; }
+  .pg-slide.active { display:flex; animation:pgIn 0.18s ease-out; }
+  .pg-slide > div { margin-top:1.5rem !important; }
+  @keyframes pgIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+  .pg-nav { width:100%; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; margin-top:1.5rem;
+    padding-top:14px; border-top:1px solid #333; }
+  .pg-arrow { display:flex; align-items:center; gap:8px; justify-self:start; background:#1a1a1a; color:#ccc;
+    border:0.5px solid #444; border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit; }
+  .pg-arrow.next { justify-self:end; }
+  .pg-arrow:hover:not(:disabled) { background:#2a2a2a; color:#fff; border-color:#666; }
+  .pg-arrow:disabled { opacity:0.3; cursor:default; }
+  .pg-chev { font-size:20px; line-height:1; margin-top:-2px; }
+  .pg-dots { display:flex; gap:6px; }
+  .pg-dot { background:none; border:0.5px solid #444; color:#888; border-radius:12px; padding:4px 10px;
+    font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .pg-dot:hover { color:#fff; border-color:#666; }
+  .pg-dot.active { background:#fff; color:#111; border-color:#fff; }
+  @media (max-width:520px) { .pg-lbl { display:none; } .pg-arrow { padding:8px 12px; } }
+
   /* ---------- P2 Forsaken ---------- */
   .fs { width:100%; max-width:1024px; margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; }
   .fs-group { width:100%; margin-bottom:16px; }
@@ -342,6 +363,9 @@
 <!-- ===== Section break ===== -->
 <div class="section-break"><span>Phase Guides</span></div>
 
+<!-- ===== Phase guide carousel ===== -->
+<div class="pg" id="pg">
+  <div class="pg-slide" data-key="p2" data-title="P2 Forsaken">
 <!-- ===== P2 Forsaken ===== -->
 <div class="fs">
   <h1>P2 Forsaken</h1>
@@ -366,7 +390,8 @@
     </div>
   </div>
 </div>
-
+  </div>
+  <div class="pg-slide" data-key="p3" data-title="P3 Black Hole">
 <!-- ===== P3 Earthquake Tethers ===== -->
 <div class="eq">
   <h1>P3 Black Hole</h1>
@@ -380,7 +405,7 @@
       <p class="eq-note">Tanks can't get Accretion.</p>
       <p class="eq-legend"><span class="eq-dot"></span><span>Kefka cleaves a side. The party stacks or splits into roles on the opposite side.</span></p>
       <p class="eq-legend"><span class="eq-dot rect"></span><span>Kefka cleaves down the center of the arena.</span></p>
-      <p class="eq-warn">The Accretion debuff WILL fall off. Remember you had it!</p>
+      <p class="eq-warn">The Accretion debuff WILL fall off. Remember that you had it!</p>
     </div>
     <div class="eq-grid">
       <table class="eq-table">
@@ -395,7 +420,8 @@
     </div>
   </div>
 </div>
-
+  </div>
+  <div class="pg-slide" data-key="p4" data-title="P4 Timeline">
 <!-- ===== P4 Mechanic Timeline ===== -->
 <div class="tl">
   <h1>P4 Mechanic Timeline</h1>
@@ -412,6 +438,13 @@
     <div class="tl-col" id="tl-right"></div>
   </div>
   <p class="tl-foot">Real / fake and twister / donut change every pull. Follow the NOTE tags.</p>
+</div>
+  </div>
+  <div class="pg-nav">
+    <button class="pg-arrow" id="pg-prev" aria-label="Previous phase"><span class="pg-chev">‹</span><span class="pg-lbl"></span></button>
+    <div class="pg-dots" id="pg-dots"></div>
+    <button class="pg-arrow next" id="pg-next" aria-label="Next phase"><span class="pg-lbl"></span><span class="pg-chev">›</span></button>
+  </div>
 </div>
 
 <script>
@@ -924,6 +957,47 @@ const FS = {"meta":{"aoeR":26.4,"towerR":21.4,"bossR":36.7,"marks":[["A",[0.2,-7
       ${S.A.map(c=>player(c,'A')).join('')}${S.B.map(c=>player(c,'B')).join('')}
     </svg>`;
   });
+})();
+
+/* ================= Phase guide carousel ================= */
+// One phase shows at a time. The URL hash (#p2, #p3, #p4) remembers which one,
+// so a link can open straight to a phase.
+(function pgInit(){
+  const root=document.getElementById('pg');
+  const slides=[...root.querySelectorAll('.pg-slide')];
+  const prev=document.getElementById('pg-prev'), next=document.getElementById('pg-next');
+  const dots=document.getElementById('pg-dots');
+  slides.forEach((sl,i)=>{
+    const d=document.createElement('button');
+    d.className='pg-dot'; d.textContent=sl.dataset.key.toUpperCase();
+    d.title=sl.dataset.title; d.onclick=()=>show(i,true);
+    dots.appendChild(d);
+  });
+  let cur=0;
+  function show(i,fromNav){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach((sl,j)=>sl.classList.toggle('active',j===cur));
+    [...dots.children].forEach((d,j)=>d.classList.toggle('active',j===cur));
+    prev.disabled=cur===0; next.disabled=cur===slides.length-1;
+    prev.querySelector('.pg-lbl').textContent=cur>0?slides[cur-1].dataset.title:'';
+    next.querySelector('.pg-lbl').textContent=cur<slides.length-1?slides[cur+1].dataset.title:'';
+    // some sandboxed previews block this; the carousel works fine without it
+    try{ history.replaceState(null,'','#'+slides[cur].dataset.key); }catch(e){}
+    // nav sits at the bottom, so jump back up to the new phase's title
+    if(fromNav && root.getBoundingClientRect().top<0) root.scrollIntoView({behavior:'smooth'});
+  }
+  prev.onclick=()=>show(cur-1,true);
+  next.onclick=()=>show(cur+1,true);
+  // swipe left / right on phones
+  let sx=null, sy=null;
+  root.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  root.addEventListener('touchend',e=>{
+    if(sx===null) return;
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; sx=null;
+    if(Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.5) show(cur+(dx<0?1:-1),true);
+  });
+  const start=slides.findIndex(sl=>'#'+sl.dataset.key===location.hash);
+  show(start<0?0:start,false);
 })();
 </script>
 </body>
