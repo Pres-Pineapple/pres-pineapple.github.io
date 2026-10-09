@@ -208,6 +208,13 @@
   .tl-icon.res img { max-width:28px; max-height:28px; }
   .tl-badge { position:absolute; right:-5px; bottom:-5px; width:16px; height:16px; border-radius:50%; background:#fff;
     color:#111; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:1.5px solid #111; }
+  .tl-notes { width:100%; margin-top:10px; background:#1a1a1a; border:0.5px solid #333; border-radius:12px; padding:12px 16px; }
+  .tl-notes h2 { font-size:15px; font-weight:600; color:#fff; margin-bottom:6px; }
+  .tl-notes ul { list-style:none; }
+  .tl-notes li { position:relative; padding-left:14px; font-size:13px; line-height:1.5; color:#ccc; }
+  .tl-notes li + li { margin-top:4px; }
+  .tl-notes li::before { content:''; position:absolute; left:2px; top:0.65em; width:5px; height:5px; border-radius:50%; background:#666; }
+  .tl-notes b { color:#fff; font-weight:600; }
   .tl-foot { font-size:12px; color:#888; margin-top:12px; text-align:center; }
 
   /* ---------- section break: tools / phase guides ---------- */
@@ -436,6 +443,13 @@
   <div class="tl-cols">
     <div class="tl-col" id="tl-left"></div>
     <div class="tl-col" id="tl-right"></div>
+  </div>
+  <div class="tl-notes">
+    <h2>Notes</h2>
+    <ul>
+      <li><b>Stack/Spread from the 1st Grand Cross</b> means you ALWAYS get an Acceleration Bomb from the 2nd. If you got a bomb from the 1st, the 2nd can't be predicted.</li>
+      <li><b>Gazes match Neo Exdeath's Grand Cross.</b> Fake 1st Grand Cross = fake Gaze #1. Same for the 2nd Grand Cross and Gaze #2.</li>
+    </ul>
   </div>
   <p class="tl-foot">Real / fake and twister / donut change every pull. Follow the NOTE tags.</p>
 </div>
@@ -682,10 +696,10 @@ init();
 const RF_STEPS=[
   {label:"Stack/Spread 1",tl:"1 · 4",boss:"Neo Exdeath"},
   {label:"Gaze 1",real:"Look Away",fake:"Look Toward",tl:"1",boss:"Neo Exdeath"},
-  {label:"Fire",real:"AOE",fake:"Donut",tl:"4",boss:"Chaos"},
+  {label:"Fire",real:"AOE",fake:"Donut",tl:"1 · 4",boss:"Chaos"},
   {label:"Stack/Spread 2",tl:"1 · 4",boss:"Neo Exdeath"},
   {label:"Gaze 2",real:"Look Away",fake:"Look Toward",tl:"4",boss:"Neo Exdeath"},
-  {label:"Water",real:"Donut",fake:"AOE",tl:"1",boss:"Chaos"},
+  {label:"Water",real:"Donut",fake:"AOE",tl:"1 · 4",boss:"Chaos"},
 ];
  
 const rfContainer=document.getElementById('rf-steps');
@@ -798,18 +812,22 @@ const TL_ICONS = {"water": "data:image/webp;base64,UklGRowFAABXRUJQVlA4WAoAAAAQA
 // body lines: plain string, or [kind, text] where kind = real | fake | warn | math
 // icons: name, add "!" if it resolves on this step, "#n" for a number badge
 const TL_STEPS = [
-  { t:'Tsunami + Grand Cross 1', note:'TSUNAMI', icons:['water','lightning','bomb','shriek#1'], body:[
-    'Chaos casts Tsunami. Note REAL or FAKE: it decides your Dynamic Fluid later.',
-    'Neo Exdeath: first set of timed debuffs (Long / Short).',
+  { t:'Tsunami or Inferno + Grand Cross 1', note:'CHAOS', icons:['water','lightning','bomb','shriek#1'], body:[
+    'Chaos casts Tsunami or Inferno. Note which one, and REAL or FAKE: Tsunami decides your Dynamic Fluid, Inferno your Entropy.',
+    'Neo Exdeath: first set of timed debuffs (Long / Short). You get either a Stack/Spread or an Acceleration Bomb.',
     'Includes 2 short Cursed Shrieks: these give Gazes #1 (step 10).']},
-  { t:'Dynamic Fluid applied', icons:['fluid'], body:['Everyone gets it, same duration (long or short).']},
+  { t:'Dynamic Fluid or Entropy applied', icons:['fluid','entropy'], body:[
+    'Whichever matches the step 1 cast: Tsunami = Dynamic Fluid, Inferno = Entropy.',
+    'Everyone gets it, same duration (long or short).']},
   { t:'Grand Cross 2 + Mystery Magic', body:[
     'Neo Exdeath Grand Cross 2 and Kefka Mystery Magic (Thunder + Ice). Each can be real or fake.', 'Dodge.']},
-  { t:'Inferno + 2nd debuff set', note:'INFERNO', icons:['shriek#2'], body:[
-    'Chaos casts Inferno. Note REAL or FAKE: it decides your Entropy later.',
-    'Second set of Neo Exdeath debuffs (real or fake).',
+  { t:'Inferno or Tsunami + 2nd debuff set', note:'CHAOS', icons:['shriek#2'], body:[
+    'Chaos casts the other one (whichever wasn\'t cast in step 1). Note REAL or FAKE.',
+    'Second set of Neo Exdeath debuffs (real or fake). You get either a Stack/Spread or an Acceleration Bomb.',
     'Includes 2 long Cursed Shrieks: these give Gazes #2 (step 13).']},
-  { t:'Entropy applied', icons:['entropy'], body:['Everyone gets it, same duration (long or short).']},
+  { t:'Entropy or Dynamic Fluid applied', icons:['entropy','fluid'], body:[
+    'The other debuff, matching the step 4 cast.',
+    'Everyone gets it, same duration (long or short).']},
   { t:'Grand Cross 3 + Mystery Magic', body:["Grand Cross real/fake doesn't matter here.", 'Dodge Thunder + Ice.']},
   { t:'Wounds applied', icons:['white','black','field','beyond'], body:[
     'Everyone: White or Black Wound.', '4 get Allagan Field, 4 get Beyond Death.']},
