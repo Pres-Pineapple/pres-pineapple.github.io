@@ -146,6 +146,25 @@
     border-top: 0.5px solid #333;
     margin: 14px 0;
   }
+  .rf-label { display:flex; align-items:center; gap:8px; }
+  .rf-step {
+    display:none; min-width:22px; height:20px; padding:0 6px; border-radius:10px;
+    border:1px solid #777; color:#ddd; font-size:11px; font-weight:700;
+    align-items:center; justify-content:center; white-space:nowrap;
+  }
+  .card.show-steps .rf-step { display:inline-flex; }
+  .rf-name { display:flex; flex-direction:column; line-height:1.2; }
+  .rf-boss { display:none; font-size:11px; color:#888; margin-top:2px; white-space:nowrap; }
+  .card.show-boss .rf-boss { display:block; }
+  .rf-toggle {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-size:12px; color:#888; margin-bottom:10px; cursor:pointer; user-select:none;
+  }
+  .rf-toggle + .rf-toggle { margin-top:-4px; }
+  .rf-switch { position:relative; width:34px; height:18px; border-radius:9px; background:#333; border:0.5px solid #555; transition:background 0.15s; flex:none; }
+  .rf-switch::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#888; transition:transform 0.15s, background 0.15s; }
+  .rf-toggle.on .rf-switch { background:#2a2a2a; border-color:#aaa; }
+  .rf-toggle.on .rf-switch::after { transform:translateX(16px); background:#fff; }
   .rf-reset {
     width: 100%;
     margin-top: 12px;
@@ -154,13 +173,115 @@
     color: #fff;
     border-color: #666;
   }
+
+  /* ---------- P4 mechanic timeline ---------- */
+  .tl { width:100%; max-width:1024px; margin-top:2.5rem; display:flex; flex-direction:column; align-items:center; }
+  .tl-track { width:100%; display:flex; flex-wrap:wrap; align-items:center; gap:6px 22px; padding:10px 16px; margin-bottom:12px;
+    background:#2a2010; border:0.5px solid #aa8020; border-radius:10px; font-size:13px; }
+  .tl-track-label { font-size:11px; font-weight:700; letter-spacing:0.6px; color:#ffcc44; }
+  .tl-track b { color:#fff; font-weight:600; }
+  .tl-track span { color:#999; }
+  .tl-cols { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
+  .tl-col { display:flex; flex-direction:column; gap:10px; }
+  @media (max-width:760px) { .tl-cols { grid-template-columns:1fr; } }
+  .tl-step { display:flex; gap:12px; background:#1a1a1a; border:0.5px solid #333; border-radius:12px; padding:12px 14px; }
+  .tl-num { flex:none; width:26px; height:26px; border-radius:50%; border:1.5px solid #bbb; color:#fff;
+    font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .tl-main { flex:1; min-width:0; }
+  .tl-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:5px; }
+  .tl-title { font-size:15px; font-weight:600; color:#fff; }
+  .tl-note { font-size:10px; font-weight:700; letter-spacing:0.6px; color:#ffcc44; background:#2a2010;
+    border:0.5px solid #aa8020; border-radius:6px; padding:2px 7px; }
+  .tl-main ul { list-style:none; }
+  .tl-main li { position:relative; padding-left:14px; font-size:13px; line-height:1.45; color:#ccc; }
+  .tl-main li::before { content:''; position:absolute; left:2px; top:0.6em; width:5px; height:5px; border-radius:50%; background:#666; }
+  .tl-main li.real { color:#4adf4a; font-weight:600; }
+  .tl-main li.fake { color:#ff5a5a; font-weight:600; }
+  .tl-main li.warn { color:#b98cff; font-weight:600; }
+  .tl-main li.math { color:#ffcc44; font-weight:600; padding-left:0; }
+  .tl-main li.math::before { display:none; }
+  .tl-icons { flex:none; display:grid; grid-template-columns:repeat(2,36px); gap:6px; align-content:start; }
+  .tl-icons.one { grid-template-columns:36px; }
+  .tl-icon { position:relative; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:7px; }
+  .tl-icon img { max-width:32px; max-height:32px; display:block; }
+  .tl-icon.res { border:1.5px solid #ff5a5a; }
+  .tl-icon.res img { max-width:28px; max-height:28px; }
+  .tl-badge { position:absolute; right:-5px; bottom:-5px; width:16px; height:16px; border-radius:50%; background:#fff;
+    color:#111; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:1.5px solid #111; }
+  .tl-foot { font-size:12px; color:#888; margin-top:12px; text-align:center; }
+
+  /* ---------- section break: tools / phase guides ---------- */
+  .section-break { width:100%; max-width:1024px; display:flex; align-items:center; gap:16px; margin-top:3rem; }
+  .section-break::before, .section-break::after { content:''; flex:1; height:1px; background:#333; }
+  .section-break-top { margin-top:1.5rem; margin-bottom:1.5rem; }
+  .section-break span { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#888; white-space:nowrap; }
+
+  /* ---------- P2 Forsaken ---------- */
+  .fs { width:100%; max-width:1024px; margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; }
+  .fs-group { width:100%; margin-bottom:16px; }
+  .fs-group h2 { font-size:14px; font-weight:600; color:#fff; margin:0 0 8px 2px; }
+  .fs-group h2 span { color:#888; font-weight:500; margin-left:6px; }
+  .fs-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:640px) { .fs-row { grid-template-columns:1fr; } }
+  .fs-card { background:#1a1a1a; border:0.5px solid #333; border-radius:12px; padding:10px; }
+  .fs-card svg { width:100%; height:auto; display:block; }
+  .fs-cap { font-size:12px; color:#888; text-align:center; margin-top:4px; }
+  .fs-key { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 18px; font-size:12px; color:#aaa; margin-bottom:4px; }
+  .fs-note { font-size:12px; color:#888; margin-bottom:14px; text-align:center; }
+  .fs-key span { display:inline-flex; align-items:center; gap:6px; }
+  .fs-key i { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%;
+    font-style:normal; font-size:10px; font-weight:800; }
+  .fs-key i.a { background:#111; color:#fff; border:1.5px solid #fff; }
+  .fs-key i.b { background:#fff; color:#111; border:1.5px solid #111; }
+
+  /* ---------- P3 Earthquake tethers ---------- */
+  .eq { width:100%; max-width:1024px; margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; }
+  .eq-wrap { width:100%; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); gap:16px; align-items:start; }
+  @media (max-width:760px) { .eq-wrap { grid-template-columns:1fr; } }
+  .eq-rules { background:#1a1a1a; border:0.5px solid #333; border-radius:12px; padding:16px 18px; font-size:14px; color:#ccc; line-height:1.5; }
+  .eq-rules p + p { margin-top:10px; }
+  .eq-rules .r { display:flex; align-items:baseline; gap:8px; }
+  .eq-role { font-weight:700; }
+  .eq-role.dps { color:#ff5a5a; } .eq-role.acc { color:#ffa53d; }
+  .sup-t { color:#5a9bff; } .sup-h { color:#4adf4a; }
+  .eq-acc-icon { width:20px; height:auto; vertical-align:-4px; margin:0 2px; }
+  .eq-rules p.eq-note { margin-top:2px; font-size:12px; color:#888; padding-left:2px; }
+  .eq-warn { margin-top:14px !important; padding:10px 12px; border-radius:8px; background:#2a2010; border:0.5px solid #aa8020; color:#ffcc44; font-weight:600; }
+  .eq-grid { background:#1a1a1a; border:0.5px solid #333; border-radius:12px; padding:10px 12px; overflow-x:auto; }
+  .eq-table { width:100%; border-collapse:collapse; }
+  .eq-table th { font-size:13px; font-weight:600; color:#fff; padding:4px 4px 8px; text-align:center; vertical-align:bottom; }
+  .eq-table th .sub { display:block; font-size:11px; font-weight:500; color:#888; margin-top:2px; }
+  .eq-table th.dps { color:#ff5a5a; } .eq-table th.acc { color:#ffa53d; }
+  .eq-table th img { width:22px; height:auto; display:block; margin:0 auto 3px; }
+  .eq-table td { padding:6px 4px; text-align:center; border-top:0.5px solid #2a2a2a; }
+  .eq-table tr.major td { border-top:1.5px solid #555; }
+  .eq-num { width:28px; color:#888; font-size:12px; font-weight:700; }
+  .eq-set { text-align:left !important; font-size:13px; font-weight:600; color:#fff; white-space:nowrap; }
+  .eq-dot { display:inline-block; width:12px; height:12px; border-radius:50%; background:#ffa53d; vertical-align:-1px; margin-right:8px; }
+  .eq-dot.off { background:transparent; }
+  .eq-dot.rect { width:7px; height:20px; border-radius:3px; vertical-align:-5px; margin-left:2px; margin-right:11px; }
+  .eq-legend { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:#aaa; margin-top:14px !important; }
+  .eq-legend .eq-dot { flex:none; margin:4px 0 0; }
+  .eq-b { display:inline-flex; align-items:center; justify-content:center; min-width:38px; height:24px; padding:0 8px;
+    border-radius:7px; font-family:Georgia,'Times New Roman',serif; font-weight:700; font-size:14px; letter-spacing:1px; }
+  @media (max-width:480px) {
+    .eq-tw { display:none; }
+    .eq-grid { padding:8px 6px; }
+    .eq-b { min-width:32px; padding:0 5px; font-size:13px; }
+    .eq-table th { font-size:12px; }
+  }
+  .eq-b.s1 { background:#16244a; border:1px solid #3d6fd6; color:#a9c6ff; }
+  .eq-b.s2 { background:#3a1430; border:1px solid #d64a9a; color:#ffa6db; }
+  .eq-b.s3 { background:#24204a; border:1px solid #7a7ff0; color:#c8caff; }
 </style>
 </head>
 <body>
  
 <h1>FFXIV Kefka Ultimate Raid Tools</h1>
-<p class="subtitle">DMU clicky arrows sim &amp; P4 tracker &lt;3</p>
+<p class="subtitle">DMU clicky arrows sim, P4 tracker &amp; phase guides &lt;3</p>
  
+<div class="section-break section-break-top"><span>Tools</span></div>
+
 <div class="columns">
  
   <!-- ===== Arrow Placement Simulator ===== -->
@@ -195,7 +316,15 @@
   <div class="col tracker">
     <h1>P4 State Tracker</h1>
     <p class="subtitle">real / fake tracker</p>
-    <div class="card">
+    <div class="card" id="rf-card">
+      <div class="rf-toggle" id="rf-toggle" role="switch" aria-checked="false" tabindex="0">
+        <span>Show timeline step numbers (when real / fake is set)</span>
+        <span class="rf-switch"></span>
+      </div>
+      <div class="rf-toggle" id="rf-toggle-boss" role="switch" aria-checked="false" tabindex="0">
+        <span>Show which boss it comes from</span>
+        <span class="rf-switch"></span>
+      </div>
       <div id="rf-steps"></div>
       <hr class="rf-divider">
       <div id="rf-bomb"></div>
@@ -208,6 +337,80 @@
  
 </div>
  
+<!-- ===== Section break ===== -->
+<div class="section-break"><span>Phase Guides</span></div>
+
+<!-- ===== P2 Forsaken ===== -->
+<div class="fs">
+  <h1>P2 Forsaken</h1>
+  <p class="subtitle">the 4 possible solve positions</p>
+  <div class="fs-key">
+    <span><i class="a">A</i>A players</span>
+    <span><i class="b">B</i>B players</span>
+  </div>
+  <p class="fs-note">A and B positions may be swapped.</p>
+  <div class="fs-group">
+    <h2>Odd towers <span>1, 3, 5, 7</span></h2>
+    <div class="fs-row">
+      <div class="fs-card"><div class="fs-svg" data-sol="0"></div><div class="fs-cap">Cardinal</div></div>
+      <div class="fs-card"><div class="fs-svg" data-sol="1"></div><div class="fs-cap">Intercardinal</div></div>
+    </div>
+  </div>
+  <div class="fs-group">
+    <h2>Even towers <span>2, 4, 6, 8</span></h2>
+    <div class="fs-row">
+      <div class="fs-card"><div class="fs-svg" data-sol="2"></div><div class="fs-cap">Cardinal</div></div>
+      <div class="fs-card"><div class="fs-svg" data-sol="3"></div><div class="fs-cap">Intercardinal</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== P3 Earthquake Tethers ===== -->
+<div class="eq">
+  <h1>P3 Black Hole</h1>
+  <p class="subtitle">tether order</p>
+  <div class="eq-wrap">
+    <div class="eq-rules">
+      <p>4 sets of Black Hole tethers. Everyone gets hit <b>3 times</b>.</p>
+      <p><span class="eq-role dps">DPS</span>: 1st tether CW from Kefka</p>
+      <p><span class="eq-role"><span class="sup-t">Supp</span><span class="sup-h">orts</span></span>: 2nd tether CW from Kefka</p>
+      <p><span class="eq-role acc">Accretion</span> <img class="eq-acc-icon" src="data:image/webp;base64,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" alt="Accretion">: 3rd tether CW from Kefka</p>
+      <p class="eq-note">Tanks can't get Accretion.</p>
+      <p class="eq-legend"><span class="eq-dot"></span><span>Kefka cleaves a side. The party stacks or splits into roles on the opposite side.</span></p>
+      <p class="eq-warn">The Accretion debuff WILL fall off. Remember you had it!</p>
+    </div>
+    <div class="eq-grid">
+      <table class="eq-table">
+        <thead><tr>
+          <th></th><th></th>
+          <th class="dps">DPS<span class="sub">N CW</span></th>
+          <th><span class="sup-t">Supp</span><span class="sup-h">orts</span><span class="sub">Middle</span></th>
+          <th class="acc"><img src="data:image/webp;base64,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" alt="">Accretion<span class="sub">NW CCW</span></th>
+        </tr></thead>
+        <tbody id="eq-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== P4 Mechanic Timeline ===== -->
+<div class="tl">
+  <h1>P4 Mechanic Timeline</h1>
+  <p class="subtitle">Kefka Says · red border = resolves here</p>
+  <div class="tl-track">
+    <span class="tl-track-label">KEEP TRACK OF</span>
+    <div><b>Tsunami</b> <span>→ Dynamic Fluid (step 14)</span></div>
+    <div><b>Inferno</b> <span>→ Entropy (step 11)</span></div>
+    <div><b>Thunder III</b> <span>+ ring (step 14)</span></div>
+    <div><b>Blizzard III</b> <span>+ ring (step 14)</span></div>
+  </div>
+  <div class="tl-cols">
+    <div class="tl-col" id="tl-left"></div>
+    <div class="tl-col" id="tl-right"></div>
+  </div>
+  <p class="tl-foot">Real / fake and twister / donut change every pull. Follow the NOTE tags.</p>
+</div>
+
 <script>
 /* ================= Arrow Placement Simulator ================= */
 const NS="http://www.w3.org/2000/svg";
@@ -441,23 +644,40 @@ init();
  
 /* ================= Kefka Real/Fake Tracker ================= */
 const RF_STEPS=[
-  {label:"Stack/Spread 1"},
-  {label:"Gaze 1",real:"Look Away",fake:"Look Toward"},
-  {label:"Fire",real:"AOE",fake:"Donut"},
-  {label:"Stack/Spread 2"},
-  {label:"Gaze 2",real:"Look Away",fake:"Look Toward"},
-  {label:"Water",real:"Donut",fake:"AOE"},
+  {label:"Stack/Spread 1",tl:"1 · 4",boss:"Neo Exdeath"},
+  {label:"Gaze 1",real:"Look Away",fake:"Look Toward",tl:"1",boss:"Neo Exdeath"},
+  {label:"Fire",real:"AOE",fake:"Donut",tl:"4",boss:"Chaos"},
+  {label:"Stack/Spread 2",tl:"1 · 4",boss:"Neo Exdeath"},
+  {label:"Gaze 2",real:"Look Away",fake:"Look Toward",tl:"4",boss:"Neo Exdeath"},
+  {label:"Water",real:"Donut",fake:"AOE",tl:"1",boss:"Chaos"},
 ];
  
 const rfContainer=document.getElementById('rf-steps');
  
-function rfMakeRow(labelText,optA,optB){
+// tl = timeline step(s) where this row's real/fake gets decided; shown when the toggle is on
+// boss = which boss it comes from; shown when the boss toggle is on
+function rfMakeRow(labelText,optA,optB,tl,boss){
   const row=document.createElement('div');
   row.className='rf-row';
  
   const label=document.createElement('span');
   label.className='rf-label';
-  label.textContent=labelText;
+  if(tl){
+    const stepTag=document.createElement('span');
+    stepTag.className='rf-step';
+    stepTag.textContent=tl;
+    label.appendChild(stepTag);
+  }
+  const name=document.createElement('span');
+  name.className='rf-name';
+  name.appendChild(document.createTextNode(labelText));
+  if(boss){
+    const bossTag=document.createElement('span');
+    bossTag.className='rf-boss';
+    bossTag.textContent=boss;
+    name.appendChild(bossTag);
+  }
+  label.appendChild(name);
  
   const group=document.createElement('div');
   group.className='rf-group';
@@ -483,7 +703,9 @@ RF_STEPS.forEach((step)=>{
     rfMakeRow(
       step.label,
       {cls:'real',text:step.real||'Real'},
-      {cls:'fake',text:step.fake||'Fake'}
+      {cls:'fake',text:step.fake||'Fake'},
+      step.tl,
+      step.boss
     )
   );
 });
@@ -491,19 +713,41 @@ RF_STEPS.forEach((step)=>{
 const rfBomb=document.getElementById('rf-bomb');
  
 rfBomb.appendChild(
-  rfMakeRow('Lightning (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'})
+  rfMakeRow('Lightning (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'10','Kefka')
 );
 rfBomb.appendChild(
-  rfMakeRow('Ice (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'})
+  rfMakeRow('Ice (Stored)',{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},'12','Kefka')
 );
 rfBomb.appendChild(
   rfMakeRow(
     'Acceleration Bomb',
     {cls:'stillness',text:'Stillness'},
-    {cls:'motion',text:'Motion'}
+    {cls:'motion',text:'Motion'},
+    '1 · 4',
+    'Neo Exdeath'
   )
 );
  
+/* Display toggles (step numbers, boss names): separate from the .choice buttons,
+   so Reset leaves them alone. Each is remembered between visits on this browser. */
+const rfCard=document.getElementById('rf-card');
+function rfMakeSwitch(id,cardClass,storeKey){
+  const el=document.getElementById(id);
+  const set=(on)=>{
+    rfCard.classList.toggle(cardClass,on);
+    el.classList.toggle('on',on);
+    el.setAttribute('aria-checked',on);
+    try{ localStorage.setItem(storeKey,on?'1':'0'); }catch(e){}
+  };
+  el.onclick=()=>set(!rfCard.classList.contains(cardClass));
+  el.onkeydown=(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.onclick(); } };
+  let saved=false;
+  try{ saved=localStorage.getItem(storeKey)==='1'; }catch(e){}
+  set(saved);
+}
+rfMakeSwitch('rf-toggle','show-steps','rfShowSteps');
+rfMakeSwitch('rf-toggle-boss','show-boss','rfShowBoss');
+
 function rfToggle(clicked,other){
   clicked.classList.toggle('active');
   other.classList.remove('active');
@@ -512,6 +756,172 @@ function rfToggle(clicked,other){
 function rfReset(){
   document.querySelectorAll('.choice').forEach((b)=>b.classList.remove('active'));
 }
+
+/* ================= P4 Mechanic Timeline ================= */
+const TL_ICONS = {"water": "data:image/webp;base64,UklGRowFAABXRUJQVlA4WAoAAAAQAAAANQAAPwAAQUxQSDsBAAABkKPtnyIpX/VUr7tB5KQWecgNdC0jWsl4iFxiYsjdL0DEGewG7g5VPVP/H07LQ8oTERMAMDl8RlF/m7RypZL+Murc8OQIgPPMqOYzeJczrWBWSkplWLKgaRzzCqp50HzPQQXVPghF1d/i4aB/aGjI/xwWqRFJjUzatFqyuhXaBGu+SMnqY0n6MuUyNjx6KVlNrCO9fLSBDDJ23XuhwurQlp7f30XGz96x541UVGamd3f34Ty/dv3M3v6oTqwmpHRrEbocf9iChfNSjOXFKB2C7ow/b3XD8hkpFOUUQTqzTJ/n7303LByRihLaQTqyAF2Um3fD9El9Kjp/lqJ0Yhq6c0rPPZyQlP7A2tLZ3Q6fU2mO27rxkoL9wpLpwpYB8FTtgN7r+v2dVSPQooYuy8gnhx8q6dHweA9klAkAVlA4ICoEAADwEwCdASo2AEAAPjEWiEMiISEVDM3QIAMEtgBUk7kB1+H8zGo/1f8McR2VnNA+Dnqb8UPpp57B10voc9LX+41CybrFl2OCaV5YM17/Z8AB+wBvMBMQMl/wuQawwZxxYo2LoYZMwsbeUJXijja9elSxqUA2qRiPYEx3lkaENMj2nWlzEC+5KEOoNF7SFVDfBRHBLhx209TrGqL0oNJQH//1dg4llRwHVAAA/v/ageIbCQc2eMFdSA/x+5fE//Pt1PWyPHDXRvfrh+Bna0obp4/39d897302waEjMQMs2plf6Y4OF04J31+MDXJmxyKnf5r3HjmmL8tYvUN//5p9lb/Bz2dLpMva2JrQ3VQwwV6dVjsmd/qpH5peCuBRIYd3x5fvn/mNhxO8aGT4koaRF3MIK1LyRRuHUJtv9chmEdDaIwCphYXysGS7LRXhocR/GiwHych/uV1NeSU3ZBrNfq9WiqJIU82df/DwHMxyzA0q7FOMefvDVcNLa0Wf8j8mCBVD1+aSP2Nj4E9NuUugahAbQzE5JmruiERiillqEFg6XR3IhLUQ6lDgIUIYZSIo9gSdirLBSah2EyA7DxUc/9hGWGcMUGTFM27nRkoSDi7JY7L7R48/BSusyr44T1KEHOEw1RsINLRGsOXhBwky+nDGIPqyRnSFYrJlaet0fF+NzqBHRyHVz8+GMmcsDXsxl8nD3/7lJ1VPLjDcixbOny09DDy0dAqPKZEg9/9gqUuoUZxIT+KZLS3M7w0vptv7yYPNimBa5IpN+J3Oa3rF6buKmTS094hFwmseUJObN51aqKIAbG3Srvd7ciGBUJ3pFi+yVhapR/rQsal4N5hfUGI3/NncS+9ky1anU1/x6G3KaVPqHJ4hKDMpNq5q4h3oMT+PcjqhnUy0bVNspu4Z8und5+HSXsYcIPw+aM6vdly7M1ntEHMa7oCMQzexn2DIm3c9bDuTgJYS96PfRrmaqT6EqvamTSTUbBCb8b9ZCW2N/APD1aj1EZNreuq7FTB0D06VkrE/D/7C5ANOC9X35B2o1YcDZqkIafuf/wzTAxCxSCBnE42OfXaQkLgPScb/8uVvKwsJmBVgfWNa0mNPlDMr452HxezLiqBEuHVkjcOLOdnvVTP9AHYwFVWB5AxEAyGIDv5ne3A5wPPkznrBiF6j2f/6yvak25mUz+pWEZFIxXlu9fnEgaPYA5lihtqFUym7b2WqL5C5wmCvdlKHLTOYMWVMCzbE8170RYR6XcCY50WpfPcfXisaLnYXDqxt4RySs09VbsloxxntLRUntbDT4k6pm1tLlz41i1f2OG//dfHJc/9XPbXwpEFjLfXE/qlvYHr3tN9Q0lKjqatvuzj2f7cNxwLZzA0dsS5r3KJBWk3XSmgBoa+GF6r0KKyYx5DM6r+NPy4CAcAA", "lightning": "data:image/webp;base64,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", "bomb": "data:image/webp;base64,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", "shriek": "data:image/webp;base64,UklGRqIFAABXRUJQVlA4WAoAAAAQAAAANAAAPwAAQUxQSPkAAAABgGtte9rmk6HMzNyuzMwMW8asZbjL3hAJLH3lOtLYJSImAECcxD3UpOVTXB17iK/19L0eQD2dZ471SOjou2N9Yum/ZcIQszD4T6gyDIRxGUagMoz/3DKMMOWMDEASVMo3xcloglTaJy05AWBsilTaG02OQ0AAQ7Ok9kLrV04NQQAQAPoW+WxKZjTJKUDgWwFgiTRZaQy51NUDCPwsgI510tj87DPX25Fryx5pc7IZuQVAiD8JAI2nfHE5uMzxoBEQyP2c1ro/OGt5XhehpFF1gcY59wtnWKiOUfKkokjDnzWLFQn8rErvKL8oXpSl8DbGIyUlH+MU+QIAVlA4IIIEAAAQFgCdASo1AEAAPjEUiEKiISEYCwYAIAMEtABYj6YDQ938yKuf1L8P5K/zqfuPuq+B/+M9pvmAc6z9gPUduKv+A63j0XfLT/bH4VfJguc3gz5BQyx0B8qFENM8uWbNvkBVK4g7ewHza0k0NL1/wFdejmVokaROg7TG2k67+dtBDoFl89veavwf/Jm5iroEtxxltpzZPoMRmwBkttX9oyVHwuNt+cF8iaj1VbhYgJ8uvN//nYbu9VqxAAD+/w+zov5Nfv/ylL8EjcSfQ7//tsSEUxM/yGwvNcW8nXLB05IEzW4jIlRIC0DnsT6ZouZbCZk3pI6/iArQQmp1S8PNNySIHpIP+wbPElWjqOobq782yW/+eUeU0hETh9DLwL032NP2HR4q3k/jExh/vsEO+GCiN2rUF7oLo/pbW1x3HTOAs+11heSSTNLcGiQPfhuoA8AiEHgOnA7H9Wv5ug51W3J7UqM9DtFF8nw3m+A4GjDQumhBsJYilm0FgTzMvHWjLqhqbIA6lJ5Dxm5bh3FkyCdrJbyR/w8/4o7SfxDy/yF9uJbcNQ//tIP/AX/85j/69JxV6iMB+JwyonWGqTbHLtqfxCgrh7L28HRY2O4t5nbjUeQvjH2+twDA20N+a/65yqYjCn91wFaXUK+HvhXH9/gpYrUTX37L6T2fhvao6F62P7ZtWNen7g4XfeAv0UaR7Uuwjj3KUjFYhnOqebn1t/m86JOvN3hltA5elyh0O10co8R6epl/SKtfHA7azGWQzUbdu1xxxLg5OfSd/VMBAaKRK2qQseNAckTzApdVojE9CH41vYrRCC3y9ELDwEnZ59OteUu7l9SLgPb26znLHhL0LSz8RUvcH4LvFZDylxrA0Ozhz5TurHHGRzYB1kP1jvW7a7BwN+8r3UPKUEAxM7kaI6QQLwNrsGm8/kO32+/cgtZIK/4eJmkGNAGk9suc5JCERS9MQr1v0zLDxh8ZMpbBlHsvnp1wKHkxSGVDs8D43jVKkFUl3r7rBAQlqf1ERNfHY4FLAW/F7XFjSRafJXjpSqqdUKNdiIxF4A6WdurxR4CH97NcBIb1FCknX85FNh8XCwniljNi1C94Yj/95XnreH5LC+RQKV3lamnQrN5uSQLzad8tEG2dAwO/zAzc4VEBp0ZbSw/qYH+X1eY22uR0no1rLuUVERynnVRo0p/mDxrPI1FbM3uwi6q/Naf+71X433/OZTO0DidRkmgzIW22M9+aIPEAn3CkjH9VgFLzzn0F11lBMDXplDJ4U8xL8Fq4YMbvy3CsOryIanQXIbSQQpzyUkRXqWjeSBrfj654aZ+N6/Vg65bjIC/9zJbQ0lhneUtm418+aaThsBHvnku9xxmY5CkYv3p9goUIQegWWfFx89ORd6Tul0L5Ze/OaJ6ZlLQ4ML5CUQ7tOClHQI682gmJWw34y7LVOcWBaZ6LMNvKr/EkeR2MZc4+9C7K/fX/w0T+8e+srtLnCTXqTolTXPGuVidsfThv8Lcx3MxvhFp8N/7pV/8Yv+C8gAEbKQgAAA==", "white": "data:image/webp;base64,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", "black": "data:image/webp;base64,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", "field": "data:image/webp;base64,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", "beyond": "data:image/webp;base64,UklGRigHAABXRUJQVlA4WAoAAAAQAAAANQAAPwAAQUxQSDsBAAABkCPZtmo3+6GYmXEAipgGwcwQqpRyjh4B2ymGLqfKjTFDSOL33rl3i6V3f+6KiAmABeRXtVNoaFifB1iwkdv1ngYrvu/Khe1WPacWZQ5F83mViybuaRqt99iEot1A0XAV7BZVU2i8sHpPmICyx/84DBIjYIKuizJPyXoWxbyIWaljNF1HnEhxMP9TqcgYiUIe/2rExTvkiRhycQHuBRcbL8kTHZ86Onn14MkifFzqASuvqcO4QpLNABxc6Xso7f1EiUf4tXuoPCnZw3V9oLqRVErdjiLJxircouUCDSe8/d97DYDrWjcCbBeNH998PAhvFv79uAQbto04//E4ul50zH+I2XJ9b+kuGeirdEDeXfLceC6ffUotlyjRfDoLI30PeV3vqS6Q77vy4PkmAB6QVx+SwvaqfMDDbQIAVlA4IMYFAABQGgCdASo2AEAAPjEUh0KiIQuFt1QQAYJbACsM4T+N7F5mNTfo/4Z4aMlnYVkH9RP5L9gDnK+aD7gPeR9GfoAf0v/LdZP6Gflv+zT+2/pHXbp+W8G/Cf438T+WJEU+Q/Yz+D/YPPjvd4AXr//M8Bxddx26fiZv5dfp72EP1U/4u8zJR/2JEx/qcQ+pYq7vVTBbUbpKtO83BjSD775rWJ5rScvRLatejQ8SnctXSnQXjCtZ/AOhko14hTHqYi+w0Zh/z4VHpsUw0+iOI++kxCDbcJ7nwFLHTqH/zwAA/v/+NLvq+8MkLMmcd/mjfzL+ffJDP9aoVoH0M4PQaSq9Hh0OfP//rnRwPAE6o3qUKDfq//vsi3FRdc4LQCcC5bluqHW9aHabgdx/ZQtjJqiFtVZgulJHfYMf+9tOpffmnIEELttyY+5X4fM6Uv/aGA+52xH5/xGGmQ6Rx3HQmu499tvAal0fe9v50XYpuf7RsLLj+05tnm4dDRfjydkKchkO1rwn/Q2ND2elIKxqan1CVnBKeqf22D2XtFTrBcZrEGQYab1QElTn35jWVptRv89G/v+eLWLf/r6xpUUJxbNKdGTNKvR+P6yr9bxmUv2bR6f+qh9/TVf+AYe3tOHdkgPzK41bkQqXsm9tp/Hb1hOJINDU2viDuRP7AeC1QqF9RgeQzZYJGtQOY+623in1m7qRH7BEkPzyOtFRtX6QDI/fm4gTCxpTRsMRicjrUFc0bL6AUlRswp5onNLm0E4FmlOXbKi1VU+st6/6s2eJbzDQUFx7UQjcliHvhLzhA8aiJdcRWcbIbkPjkmqNM/VvwsZdXqBG2dr8lu3o2Nr9+1dEc+9//Zfw1TnVsLgyqu15zguPf3v2dDRVuAN2Ycco6yMG3i/7ZRbqreFHQD3m6nZ7wlf1J6FT7fiuEjzJsf+P9WFZkEpA3GDxBTF3bLleuGyw2CTUAKh/Tv8XpbxlZm5Jb5VwpFNtnlCrNNbIUIA0Vrc0Pc7WgSCKmj2qI9LFtrjF7BovoWt/lL6Ca+/rRbQ00kNWfT4P4X2nuAeHIf9rv1iTu+TYdpLBYcgz4xsVv3bXLzFSeXG0YwIoTg4uxWfjX20DRhKo8j4RBbWAKcxUhFptP9/hSfE7PT4Yz06lrOvUKL0Xs4JgeMEiZUzc0fIW8KWlRDq7dUKvA5MsdJG+jR+4j4yWHr0y8NdaIrn+u91eBUbenqtmbqt7MbTKMoqBqFs/swPChAsaSK6SKP8fpxwEX7L2l6N9D0xtkYd8CvMfq+5MQaRQ20f/zxepvh1YBO/ZtmKbsV0S7HtNbseeJIczWB5ZW9/iz3c3CVdhU4OmQc2bybP6FaL8RGz0qBzRYKW8eBaokFrbmfiPrYHqa6DGzgVNscHKeMS7LnVC9CTSeLuQmzI4NPWiO/LH3XTibqmfQo//8lV2Y3FrRlSHCC+ikGdHwKLl4Hkfwv/8Ysx6pgP8hufwgs0H+pbcS0ejJZsaVEDzPWSZ0aF47sUKwa2rOF3g4kz7QQphDqx2jOo4YkWgfTWlE+kzZNqonuD5GwTuouqy3lOpKmtZfKw/BJDP2DuXiOJiH9DqahbLF+NXIaDxD37J6LsZA30f8pfaKa7osvjVY95ByynYvUfxIgiELbc5LXK9tg4rkXioYxqGT7xRl3AB8yAc8UWOBs2eciHGelNMTA3IJAhYfvekCYn+GiHzXfqiYehX7VEGUKNfg+RJ9BuMy21oXBzOUT9XUkB1I1DDTm7ZI57FSEkG+BR/upns/nfItzsWXdNyPWKI2Lpmje8mo4rPrOTnBTyk3WmM1cyMsBeqBKFTSkI88Zj/ytOPoYq6hfRzistYh48KEOIc/gdOltsg2s22a2jIXf0dmUWPPNVsUmD4HUf+rJ2+v/NYy+R1vDiKuW2xYSoqu5CtNP+jQ/uPR5VGPEivwgHRDsk4vMTXL+CH4DaYljGbKaCiTAAAAA==", "entropy": "data:image/webp;base64,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", "fluid": "data:image/webp;base64,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"};
+// body lines: plain string, or [kind, text] where kind = real | fake | warn | math
+// icons: name, add "!" if it resolves on this step, "#n" for a number badge
+const TL_STEPS = [
+  { t:'Tsunami + Grand Cross 1', note:'TSUNAMI', icons:['water','lightning','bomb','shriek#1'], body:[
+    'Chaos casts Tsunami. Note REAL or FAKE: it decides your Dynamic Fluid later.',
+    'Neo Exdeath: first set of timed debuffs (Long / Short).',
+    'Includes 2 short Cursed Shrieks: these give Gazes #1 (step 10).']},
+  { t:'Dynamic Fluid applied', icons:['fluid'], body:['Everyone gets it, same duration (long or short).']},
+  { t:'Grand Cross 2 + Mystery Magic', body:[
+    'Neo Exdeath Grand Cross 2 and Kefka Mystery Magic (Thunder + Ice). Each can be real or fake.', 'Dodge.']},
+  { t:'Inferno + 2nd debuff set', note:'INFERNO', icons:['shriek#2'], body:[
+    'Chaos casts Inferno. Note REAL or FAKE: it decides your Entropy later.',
+    'Second set of Neo Exdeath debuffs (real or fake).',
+    'Includes 2 long Cursed Shrieks: these give Gazes #2 (step 13).']},
+  { t:'Entropy applied', icons:['entropy'], body:['Everyone gets it, same duration (long or short).']},
+  { t:'Grand Cross 3 + Mystery Magic', body:["Grand Cross real/fake doesn't matter here.", 'Dodge Thunder + Ice.']},
+  { t:'Wounds applied', icons:['white','black','field','beyond'], body:[
+    'Everyone: White or Black Wound.', '4 get Allagan Field, 4 get Beyond Death.']},
+  { t:'Flood of Naught', icons:['field!','beyond!'], body:[
+    'Neo Exdeath jumps to a random cardinal / intercard. One side gets a White orb, the other Black.',
+    ['real','Real cast: colors hit as shown.'], ['fake','Fake cast: colors are inverted.'],
+    'Allagan Field = OPPOSITE color. Beyond Death = SAME color.',
+    ['warn','MIDDLE IS NOT SAFE: kill laser between the colors.']]},
+  { t:'Stacks & Spreads #1', icons:['water!','lightning!','bomb!'], body:[
+    'Support stack N · DPS stack S · Support spread W · DPS spread E.',
+    "Everyone max melee. Spreads: don't go to the wall.",
+    '4 players resolve Stillness / Motion here.',
+    "Spread players can mark themselves as a reminder. (Kefka's Mana Charge does nothing.)"]},
+  { t:'Thrumming Thunder III + Gazes #1', note:'THUNDER', icons:['shriek!#1'], body:[
+    'Kefka casts Thrumming Thunder III. REMEMBER real or fake.',
+    'First gazes resolve. Gazes: Support N, DPS S.',
+    'Line up along the Thunder edge. Only gaze players inside the hitbox.',
+    ['real','Real gaze: gazes under boss facing out; party out and look away.'],
+    ['fake','Fake gaze: gazes under boss facing each other; everyone else looks in.']]},
+  { t:'Entropy + Ultima Upsurge', icons:['entropy!'], body:[
+    'Stack center.',
+    ['real','Inferno real = twister: dodge out (about hitbox size).'],
+    ['fake','Inferno fake = donut: stay in the middle.'],
+    'Ultima Upsurge raidwide. Then run to your next stack / spread spot.']},
+  { t:'Stacks & Spreads #2 + Blizzard III', note:'BLIZZARD', icons:['water!','lightning!','bomb!'], body:[
+    'Same spots, use true north. Other 4 resolve Stillness / Motion.',
+    'Kefka casts Blizzard III Blowout. REMEMBER real or fake.']},
+  { t:'Gazes #2', icons:['shriek!#2'], body:['Same real / fake gaze rules as Gazes #1. Support N, DPS S.']},
+  { t:'Dynamic Fluid + Mana Release', icons:['fluid!'], body:[
+    'Stack center.',
+    ['real','Tsunami real = donut: stay in the middle.'],
+    ['fake','Tsunami fake = twister: dodge out.'],
+    'Kefka Mana Release shows 2 rings (real / fake). Combine with your stored Thunder III and Blizzard III:',
+    ['math','Real + Real = Real · Fake + Fake = Real · Real + Fake = Fake']]},
+  { t:'Final Thunder & Ice', body:[
+    'Telegraphs show for about 5 seconds as the Fluid resolves.',
+    ['real','Combined result real: dodge the telegraph.'],
+    ['fake','Combined result fake: the telegraph is inverted.']]},
+  { t:'Ultima Upsurge, then enrage', body:['Last raidwide. Get boss HP below 25% to advance.']},
+];
+
+function tlRender(){
+  const esc = (x) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  TL_STEPS.forEach((st,i)=>{
+    const lines = st.body.map(b => Array.isArray(b)
+      ? `<li class="${b[0]}">${esc(b[1])}</li>` : `<li>${esc(b)}</li>`).join('');
+    const icons = (st.icons||[]).map(spec=>{
+      const [nm,badge] = spec.split('#');
+      const res = nm.endsWith('!'), key = nm.replace('!','');
+      return `<div class="tl-icon${res?' res':''}"><img src="${TL_ICONS[key]}" alt="${key}">`
+           + (badge?`<span class="tl-badge">${badge}</span>`:'') + `</div>`;
+    }).join('');
+    const el = document.createElement('div');
+    el.className = 'tl-step';
+    el.innerHTML = `<div class="tl-num">${i+1}</div>
+      <div class="tl-main">
+        <div class="tl-head"><span class="tl-title">${esc(st.t)}</span>${st.note?`<span class="tl-note">NOTE ${st.note}</span>`:''}</div>
+        <ul>${lines}</ul>
+      </div>
+      ${icons?`<div class="tl-icons${st.icons.length===1?' one':''}">${icons}</div>`:''}`;
+    document.getElementById(i<8?'tl-left':'tl-right').appendChild(el);
+  });
+}
+tlRender();
+
+/* ================= P3 Earthquake tethers ================= */
+// c = [DPS, Supports, Accretion] stack count shown on each step ('' = none)
+// set = tether set label, dot = orange marker ('circle' = Kefka side cleave, 'rect'), major = heavy divider above the row
+const EQ_ROWS = [
+  {set:'First Tethers',  dot:'circle', c:['I','','']},
+  {major:true,                     c:['I','I','']},
+  {set:'Second Tethers', dot:'circle', major:true, c:['I','I','I']},
+  {                                c:['II','I','I']},
+  {                                c:['II','II','I']},
+  {set:'Third Tethers',  dot:'rect', major:true, c:['II','II','II']},
+  {                                c:['III','II','II']},
+  {                                c:['III','III','II']},
+  {set:'Fourth Tethers', dot:'circle', major:true, c:['III','III','']},
+  {dot:'rect', major:true,         c:['','III','']},
+];
+(function eqRender(){
+  const cls={I:'s1',II:'s2',III:'s3'};
+  document.getElementById('eq-body').innerHTML = EQ_ROWS.map((r,i)=>
+    `<tr${r.major?' class="major"':''}>
+      <td class="eq-num">${i+1}</td>
+      <td class="eq-set"><span class="eq-dot${r.dot==='rect'?' rect':r.dot?'':' off'}"></span>${r.set?r.set.replace(' Tethers','<span class="eq-tw"> Tethers</span>'):''}</td>
+      ${r.c.map(v=>`<td>${v?`<span class="eq-b ${cls[v]}">${v}</span>`:''}</td>`).join('')}
+    </tr>`).join('');
+})();
+
+/* ================= P2 Forsaken diagrams ================= */
+// Arena units: center (0,0), arena radius 100, y points south.
+// Each solve: boss hitbox (c, face = facing angle in degrees, 0 = east, 90 = south),
+// orange / gray / blue = circle AoEs (centers), towers = white rings, cones = {p, a1, a2, r},
+// A / B = player positions.
+const FS = {"meta":{"aoeR":26.4,"towerR":21.4,"bossR":36.7,"marks":[["A",[0.2,-75.3],"c","#ff4d6d"],["B",[75.2,-0.3],"c","#ffe066"],["C",[-0.2,75.1],"c","#5aa9ff"],["D",[-74.9,-0.3],"c","#c58cff"],["1",[-35.8,-35.8],"s","#ff4d6d"],["2",[35.6,-35.8],"s","#ffe066"],["3",[35.2,35.3],"s","#5aa9ff"],["4",[-35.6,35.5],"s","#c58cff"]]},"sols":[{"par":"odd","boss":{"c":[-0.2,-4.6],"face":90},"orange":[[-36.5,27.7],[27.0,17.4]],"gray":[],"blue":[[41.2,50.7]],"towers":[[-34.1,33.6],[33.3,33.6]],"cones":[{"p":[-37.4,51.3],"a1":140.6,"a2":70.7,"r":71.3}],"A":[[-36.3,27.8],[27.0,17.4],[-37.4,50.0],[40.8,50.7]],"B":[[-14.7,19.6],[11.5,22.1],[9.9,27.3],[-39.3,58.8]]},{"par":"odd","boss":{"c":[6.7,-6.2],"face":135},"orange":[[-41.2,-9.6],[10.6,28.0]],"gray":[],"blue":[[-3.2,61.4]],"towers":[[-43.6,-4.2],[3.5,43.9]],"cones":[{"p":[-59.0,5.7],"a1":-173.6,"a2":116.2,"r":71.3}],"A":[[-41.2,-9.6],[-27.2,-14.1],[-57.7,4.9],[10.6,28.0],[-3.4,61.4]],"B":[[-20.3,-0.3],[-65.4,9.8],[-3.5,20.4],[-8.6,22.6]]},{"par":"even","boss":{"c":[0.0,-4.6],"face":90},"orange":[],"gray":[[-24.6,-31.6],[25.0,-31.0]],"blue":[[-32.6,53.2],[35.9,52.6]],"towers":[[-33.7,33.6],[33.7,33.6]],"cones":[{"p":[-33.0,14.1],"a1":-127.6,"a2":162.6,"r":71.3},{"p":[31.8,14.1],"a1":-53.6,"a2":17.6,"r":71.3}],"A":[[-32.6,14.6],[28.9,15.2],[-32.6,52.8],[36.1,52.4]],"B":[[-24.6,-31.6],[25.1,-31.2],[-65.5,4.2],[65.9,3.1]]},{"par":"even","boss":{"c":[3.7,-3.6],"face":135},"orange":[],"gray":[[5.6,-40.9],[40.2,-5.5]],"blue":[[-60.0,13.1],[-11.0,61.2]],"towers":[[-46.9,-1.4],[0.6,46.3]],"cones":[{"p":[-32.8,-14.2],"a1":-145.4,"a2":-75.4,"r":71.3},{"p":[11.1,32.4],"a1":-10.6,"a2":57.8,"r":71.3}],"A":[[-32.8,-14.2],[-59.8,12.9],[11.1,32.4],[-10.6,61.2]],"B":[[-43.6,-44.0],[6.0,-41.2],[40.4,-5.7],[43.9,44.4]]}]};
+(function fsRender(){
+  const M=FS.meta, NS='http://www.w3.org/2000/svg';
+  const rad=(d)=>d*Math.PI/180;
+  const pt=(c,r,a)=>[c[0]+r*Math.cos(rad(a)), c[1]+r*Math.sin(rad(a))];
+  const arc=(c,r,a1,a2,large)=>{const p1=pt(c,r,a1),p2=pt(c,r,a2);
+    return `M${p1[0]} ${p1[1]} A${r} ${r} 0 ${large} 1 ${p2[0]} ${p2[1]}`;};
+  const circles=(list,r,cls)=>list.map(c=>`<circle class="${cls}" cx="${c[0]}" cy="${c[1]}" r="${r}"/>`).join('');
+  const cone=(k)=>{let a1=k.a1,a2=k.a2,d=((a2-a1)%360+360)%360;
+    if(d>180){[a1,a2]=[a2,a1]; d=360-d;}
+    const p1=pt(k.p,k.r,a1),p2=pt(k.p,k.r,a1+d);
+    return `<path class="cone" d="M${k.p[0]} ${k.p[1]} L${p1[0]} ${p1[1]} A${k.r} ${k.r} 0 0 1 ${p2[0]} ${p2[1]} Z"/>`;};
+  let grid='';
+  for(let g=-100; g<=100; g+=25){ grid+=`<line x1="${g}" y1="-100" x2="${g}" y2="100"/><line x1="-100" y1="${g}" x2="100" y2="${g}"/>`; }
+  const marks=M.marks.map(([t,c,shape,col])=> shape==='c'
+    ? `<circle cx="${c[0]}" cy="${c[1]}" r="7.5" fill="${col}22" stroke="${col}" stroke-width="1"/>
+       <text x="${c[0]}" y="${c[1]}" fill="${col}" class="mk">${t}</text>`
+    : `<rect x="${c[0]-7.5}" y="${c[1]-7.5}" width="15" height="15" rx="1.5" fill="${col}22" stroke="${col}" stroke-width="1"/>
+       <text x="${c[0]}" y="${c[1]}" fill="${col}" class="mk">${t}</text>`).join('');
+  const player=(c,t)=>`<g class="pl ${t.toLowerCase()}"><circle cx="${c[0]}" cy="${c[1]}" r="3.6"/><text x="${c[0]}" y="${c[1]}">${t}</text></g>`;
+  document.querySelectorAll('.fs-svg').forEach(el=>{
+    const S=FS.sols[+el.dataset.sol], b=S.boss, br=M.bossR, back=b.face+180;
+    const ring=arc(b.c,br,back+45,back+315,1);
+    const tab=pt(b.c,br,b.face), tabIn=pt(b.c,br-6,b.face);
+    el.innerHTML=`<svg viewBox="-104 -104 208 208" xmlns="${NS}">
+      <defs><clipPath id="fs-clip-${el.dataset.sol}"><circle r="100"/></clipPath></defs>
+      <style>
+        .fs-svg line{stroke:#ffffff10;stroke-width:0.4}
+        .fs-svg .mk{font:700 8px system-ui,sans-serif;text-anchor:middle;dominant-baseline:central}
+        .fs-svg .cone,.fs-svg .blue{fill:#5a9bff40;stroke:#5a9bff;stroke-width:0.6}
+        .fs-svg .orange{fill:#ffa53d55;stroke:#ffa53d;stroke-width:0.6}
+        .fs-svg .gray{fill:#dddddd40;stroke:#ddd;stroke-width:0.6}
+        .fs-svg .tower{fill:none;stroke:#fff;stroke-width:1.1}
+        .fs-svg .pl circle{stroke-width:0.7}
+        .fs-svg .pl text{font:800 4.4px system-ui,sans-serif;text-anchor:middle;dominant-baseline:central}
+        .fs-svg .pl.a circle{fill:#111;stroke:#fff} .fs-svg .pl.a text{fill:#fff}
+        .fs-svg .pl.b circle{fill:#fff;stroke:#111} .fs-svg .pl.b text{fill:#111}
+      </style>
+      <circle r="100" fill="#222" stroke="#666" stroke-width="0.8"/>
+      <g clip-path="url(#fs-clip-${el.dataset.sol})">${grid}</g>
+      ${marks}
+      <g clip-path="url(#fs-clip-${el.dataset.sol})">
+        ${S.cones.map(cone).join('')}
+        ${circles(S.blue,M.aoeR,'blue')}${circles(S.orange,M.aoeR,'orange')}${circles(S.gray,M.aoeR,'gray')}
+      </g>
+      ${circles(S.towers,M.towerR,'tower')}
+      <path d="${ring}" fill="none" stroke="#d9c9a3" stroke-width="3" stroke-linecap="round"/>
+      <path d="M${pt(b.c,br+3,b.face-6).join(' ')} L${pt(b.c,br+3,b.face+6).join(' ')} L${pt(b.c,br-5,b.face).join(' ')} Z" fill="#d9c9a3"/>
+      <circle cx="${b.c[0]}" cy="${b.c[1]}" r="3" fill="#ffa53d"/>
+      ${S.A.map(c=>player(c,'A')).join('')}${S.B.map(c=>player(c,'B')).join('')}
+    </svg>`;
+  });
+})();
 </script>
 </body>
 </html>
