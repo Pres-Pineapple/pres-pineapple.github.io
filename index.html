@@ -104,6 +104,16 @@
     margin-bottom: 7px;
   }
   .rf-label { color: #ccc; font-size: 14px; }
+  /* simple mode: linked rows replace the individual rows they cover */
+  .rf-row.rf-simple-row { display:none; }
+  .card.simple .rf-row.rf-simple-row { display:flex; }
+  .card.simple .rf-row.rf-grouped { display:none; }
+  .rf-members { display:block; font-size:11px; color:#888; margin-top:2px; white-space:nowrap; }
+  .rf-result { display:none; margin-top:3px; font-size:11.5px; line-height:1.45; }
+  .rf-result b { color:#aaa; font-weight:600; }
+  .rf-result.real { color:#4adf4a; } .rf-result.fake { color:#ff5a5a; }
+  .rf-simple-row.picked .rf-members { display:none; }
+  .rf-simple-row.picked .rf-result { display:block; }
   .rf-group { display: flex; gap: 7px; }
   .choice {
     min-width: 60px;
@@ -347,6 +357,10 @@
     <h1>P4 State Tracker</h1>
     <p class="subtitle">real / fake tracker</p>
     <div class="card" id="rf-card">
+      <div class="rf-toggle" id="rf-toggle-simple" role="switch" aria-checked="false" tabindex="0">
+        <span>Simple mode (debuffs applied together share one toggle)</span>
+        <span class="rf-switch"></span>
+      </div>
       <div class="rf-toggle" id="rf-toggle" role="switch" aria-checked="false" tabindex="0">
         <span>Show timeline step numbers (when real / fake is set)</span>
         <span class="rf-switch"></span>
@@ -748,7 +762,7 @@ function rfMakeRow(labelText,optA,optB,tl,boss){
   return row;
 }
  
-RF_STEPS.forEach((step)=>{
+const rfRows=RF_STEPS.map((step)=>
   rfContainer.appendChild(
     rfMakeRow(
       step.label,
@@ -757,8 +771,70 @@ RF_STEPS.forEach((step)=>{
       step.tl,
       step.boss
     )
-  );
+  )
+);
+
+/* ---------- Simple mode ----------
+   Debuffs applied by the same cast share one Real/Fake toggle.
+   members = indexes into RF_STEPS. The group row drives the member rows,
+   so switching simple mode off shows the same answers on the individual rows.
+   extra = also covered by the group but not linked to a row (each Grand Cross
+   can give an Acceleration Bomb: real = Stillness, fake = Motion). The single
+   Acceleration Bomb row is hidden in simple mode. */
+const RF_GROUPS=[
+  {label:"Grand Cross 1",members:[0,1],extra:["Accel Bomb 1"],tl:"1",boss:"Neo Exdeath"},
+  {label:"Grand Cross 2",members:[3,4],extra:["Accel Bomb 2"],tl:"3",boss:"Neo Exdeath"},
+];
+// what to do for each debuff once the group is picked as real or fake
+const RF_GROUP_RESULTS={
+  real:[["Stack/Spread","do what it says"],["Gaze","look away"],["Accel Bomb","stillness"]],
+  fake:[["Stack/Spread","do the opposite"],["Gaze","look toward"],["Accel Bomb","motion"]],
+};
+const rfGroupRows=RF_GROUPS.map((g)=>{
+  const row=rfMakeRow(g.label,{cls:'real',text:'Real'},{cls:'fake',text:'Fake'},g.tl,g.boss);
+  row.classList.add('rf-simple-row');
+  const members=document.createElement('span');
+  members.className='rf-members';
+  members.textContent=g.members.map(i=>RF_STEPS[i].label).concat(g.extra||[]).join(' + ');
+  row.querySelector('.rf-name').insertBefore(members,row.querySelector('.rf-boss'));
+  g.members.forEach(i=>rfRows[i].classList.add('rf-grouped'));
+  rfContainer.insertBefore(row,rfRows[g.members[0]]);
+  const result=document.createElement('span');
+  result.className='rf-result';
+  row.querySelector('.rf-name').insertBefore(result,members.nextSibling);
+  const [gA,gB]=row.querySelectorAll('.choice');
+  // show what to do for each debuff once real or fake is picked
+  const showResult=()=>{
+    const pick=gA.classList.contains('active')?'real':gB.classList.contains('active')?'fake':'';
+    row.classList.toggle('picked',!!pick);
+    result.className='rf-result '+pick;
+    result.innerHTML=pick?RF_GROUP_RESULTS[pick].map(([k,v])=>`<b>${k}:</b> ${v}`).join('<br>'):'';
+  };
+  const sync=()=>{
+    g.members.forEach(i=>{
+      const [mA,mB]=rfRows[i].querySelectorAll('.choice');
+      mA.classList.toggle('active',gA.classList.contains('active'));
+      mB.classList.toggle('active',gB.classList.contains('active'));
+    });
+    showResult();
+  };
+  gA.onclick=()=>{ rfToggle(gA,gB); sync(); };
+  gB.onclick=()=>{ rfToggle(gB,gA); sync(); };
+  return {g,gA,gB,showResult};
 });
+// when simple mode turns on, carry over answers if the member rows agree
+function rfSyncGroupsFromMembers(){
+  rfGroupRows.forEach(({g,gA,gB})=>{
+    const st=g.members.map(i=>{
+      const [mA,mB]=rfRows[i].querySelectorAll('.choice');
+      return mA.classList.contains('active')?'A':mB.classList.contains('active')?'B':'';
+    });
+    const same=st.every(v=>v===st[0]);
+    gA.classList.toggle('active',same&&st[0]==='A');
+    gB.classList.toggle('active',same&&st[0]==='B');
+  });
+  rfGroupRows.forEach(r=>r.showResult());
+}
  
 const rfBomb=document.getElementById('rf-bomb');
  
@@ -777,17 +853,19 @@ rfBomb.appendChild(
     'Neo Exdeath'
   )
 );
+rfBomb.lastChild.classList.add('rf-grouped'); // covered by the Grand Cross rows in simple mode
  
 /* Display toggles (step numbers, boss names): separate from the .choice buttons,
    so Reset leaves them alone. Each is remembered between visits on this browser. */
 const rfCard=document.getElementById('rf-card');
-function rfMakeSwitch(id,cardClass,storeKey){
+function rfMakeSwitch(id,cardClass,storeKey,onChange){
   const el=document.getElementById(id);
   const set=(on)=>{
     rfCard.classList.toggle(cardClass,on);
     el.classList.toggle('on',on);
     el.setAttribute('aria-checked',on);
     try{ localStorage.setItem(storeKey,on?'1':'0'); }catch(e){}
+    if(onChange) onChange(on);
   };
   el.onclick=()=>set(!rfCard.classList.contains(cardClass));
   el.onkeydown=(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.onclick(); } };
@@ -795,6 +873,7 @@ function rfMakeSwitch(id,cardClass,storeKey){
   try{ saved=localStorage.getItem(storeKey)==='1'; }catch(e){}
   set(saved);
 }
+rfMakeSwitch('rf-toggle-simple','simple','rfSimple',(on)=>{ if(on) rfSyncGroupsFromMembers(); });
 rfMakeSwitch('rf-toggle','show-steps','rfShowSteps');
 rfMakeSwitch('rf-toggle-boss','show-boss','rfShowBoss');
 
@@ -805,6 +884,7 @@ function rfToggle(clicked,other){
  
 function rfReset(){
   document.querySelectorAll('.choice').forEach((b)=>b.classList.remove('active'));
+  rfGroupRows.forEach(r=>r.showResult());
 }
 
 /* ================= P4 Mechanic Timeline ================= */
